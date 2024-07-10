@@ -38,19 +38,16 @@ public partial class Memory : RoboExpertModule
         switch (command)
         {
             case "reset":
-                if (_undoHistory.Reset().Exists)
-                    Speak("Resetting");
+                Speak(_undoHistory.Reset().Exists ? "Resetting" : "Nothing to reset");
                 break;
             case "undo":
                 {
-                    if (_undoHistory.Undo() is { Exists: true, Item.Length: var len })
-                        Speak("Undone to stage " + (len + 1));
+                    Speak(_undoHistory.Undo() is { Exists: true, Item.Length: var len } ? "Undone to stage " + (len + 1) : "Nothing to undo");
                     break;
                 }
             case "redo":
                 {
-                    if (_undoHistory.Redo() is { Exists: true, Item.Length: var len })
-                        Speak("Redone to stage " + (len + 1));
+                    Speak(_undoHistory.Redo() is { Exists: true, Item.Length: var len } ? "Redone to stage " + (len + 1) : "Nothing to redo");
                     break;
                 }
             default:
