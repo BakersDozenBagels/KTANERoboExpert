@@ -39,42 +39,45 @@ public partial class Memory : RoboExpertModule
 
     public override void ProcessCommand(string command)
     {
-        if (command == "reset")
+        switch (command)
         {
-            if (_undoHistory.Reset().Exists)
-                Speak("Resetting");
-        }
-        else if (command == "undo")
-        {
-            if (_undoHistory.Undo() is { Exists: true, Item.Length: var len })
-                Speak("Undone to stage " + (len + 1));
-        }
-        else if (command == "redo")
-        {
-            if (_undoHistory.Redo() is { Exists: true, Item.Length: var len })
-                Speak("Redone to stage " + (len + 1));
-        }
-        else
-        {
-            var m = CommandMatcher().Match(command);
-            var stage = new Stage(
-                    int.Parse(m.Groups[1].Value),
-                    int.Parse(m.Groups[2].Value),
-                    int.Parse(m.Groups[3].Value),
-                    int.Parse(m.Groups[4].Value),
-                    int.Parse(m.Groups[5].Value));
+            case "reset":
+                if (_undoHistory.Reset().Exists)
+                    Speak("Resetting");
+                break;
+            case "undo":
+                {
+                    if (_undoHistory.Undo() is { Exists: true, Item.Length: var len })
+                        Speak("Undone to stage " + (len + 1));
+                    break;
+                }
+            case "redo":
+                {
+                    if (_undoHistory.Redo() is { Exists: true, Item.Length: var len })
+                        Speak("Redone to stage " + (len + 1));
+                    break;
+                }
+            default:
+                var m = CommandMatcher().Match(command);
+                var stage = new Stage(
+                        int.Parse(m.Groups[1].Value),
+                        int.Parse(m.Groups[2].Value),
+                        int.Parse(m.Groups[3].Value),
+                        int.Parse(m.Groups[4].Value),
+                        int.Parse(m.Groups[5].Value));
 
-            if (!stage.Buttons.Order().SequenceEqual([1, 2, 3, 4]))
-            {
-                Speak("Pardon?");
-                return;
-            }
+                if (!stage.Buttons.Order().SequenceEqual([1, 2, 3, 4]))
+                {
+                    Speak("Pardon?");
+                    return;
+                }
 
-            var newState = new Stage[Stages.Length + 1];
-            Array.Copy(Stages, newState, newState.Length - 1);
-            _undoHistory.Do(newState);
+                var newState = new Stage[Stages.Length + 1];
+                Array.Copy(Stages, newState, newState.Length - 1);
+                _undoHistory.Do(newState);
 
-            RunStage(stage, newState.Length - 1);
+                RunStage(stage, newState.Length - 1);
+                break;
         }
     }
 

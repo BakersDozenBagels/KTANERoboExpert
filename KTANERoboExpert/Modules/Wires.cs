@@ -38,7 +38,7 @@ public partial class Wires : RoboExpertModule
     {
         var colors = CommandMatcher().Matches(command).Select(m => m.Groups[1].Value).ToArray();
 
-        string[] ord = new[] { "first", "second", "third", "fourth", "fifth", "sixth" };
+        string[] ord = ["first", "second", "third", "fourth", "fifth", "sixth"];
         if (!_checkingEdgework)
             SpeakSSML("<prosody rate=\"+40%\">" + colors.Select(c => c == "black" ? "k" : c[0].ToString()).Join(" ") + "</prosody>");
         _checkingEdgework = false;
