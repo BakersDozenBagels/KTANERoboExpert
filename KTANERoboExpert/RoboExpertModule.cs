@@ -87,10 +87,7 @@ public abstract class RoboExpertModule
     /// Called when the solver is selected.
     /// </summary>
     /// <returns>
-    /// <see langword="true"/> to skip the default selection message.
-    /// In this case, you should provide your own selection message.
-    /// </returns>
-    public virtual bool Select() => false;
+    public virtual void Select() => Speak("Go on " + Name);
     /// <summary>
     /// Called when the solver should handle a command.
     /// </summary>

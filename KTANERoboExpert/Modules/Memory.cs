@@ -31,11 +31,7 @@ public partial class Memory : RoboExpertModule
     private readonly UndoStack<Stage[]> _undoHistory = new([]);
     private Stage[] Stages => _undoHistory.Current;
 
-    public override bool Select()
-    {
-        Speak("Go on memory stage " + (Stages.Length + 1));
-        return true;
-    }
+    public override void Select() => Speak("Go on memory stage " + (Stages.Length + 1));
 
     public override void ProcessCommand(string command)
     {

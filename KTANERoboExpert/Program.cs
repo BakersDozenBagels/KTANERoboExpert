@@ -377,8 +377,7 @@ internal static partial class Program
                         _microphone.LoadGrammar(mod.Grammar);
                     _defaultGrammar.Enabled = false;
                     _contexts.Push(new Context(mod, mod.Grammar));
-                    if (!mod.Select())
-                        Speak("Go on " + mod.Name);
+                    mod.Select();
                 });
             }
             else if (command.StartsWith("edgework"))
