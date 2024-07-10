@@ -74,6 +74,7 @@ public partial class Memory : RoboExpertModule
 
                 var newState = new Stage[Stages.Length + 1];
                 Array.Copy(Stages, newState, newState.Length - 1);
+                newState[^1] = stage;
                 _undoHistory.Do(newState);
 
                 RunStage(stage, newState.Length - 1);
@@ -173,6 +174,8 @@ public partial class Memory : RoboExpertModule
         Stages[^1] = Stages[^1] with { Press = v - 1 };
         if (Stages.Length == 5)
         {
+            // 5 stages done is not a valid state to ask about
+            _undoHistory.Undo();
             _undoHistory.NewModule();
             ExitSubmenu();
         }

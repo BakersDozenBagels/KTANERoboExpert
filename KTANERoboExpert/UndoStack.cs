@@ -45,7 +45,7 @@ public sealed class UndoStack<T>(T baseState)
     /// <returns>The state redone to, or an empty <see cref="Maybe{T}"/> if no redo is possible (i.e. when no actions have been undone, or all undone actions have been forgotten).</returns>
     public Maybe<T> Redo() => _pointer == _history.Count - 1 ? new() : new(_history[++_pointer].Frame);
     /// <summary>
-    /// Resets to the start of the current module instance. For a full reset, use <see cref="Clear"/>.
+    /// Resets to the start of the current module instance. This forgets any undone actions. For a full reset, use <see cref="Clear"/>.
     /// </summary>
     /// <returns>The state reset to, or an empty <see cref="Maybe{T}"/> if no reset is possible (i.e. when already at the start of a module instance).</returns>
     public Maybe<T> Reset()

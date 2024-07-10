@@ -31,10 +31,7 @@ public readonly struct Maybe<T> : IEnumerable<T>
     /// <summary>
     /// Creates a new instance without an item.
     /// </summary>
-    public Maybe()
-    {
-        Exists = true;
-    }
+    public Maybe() { }
 
     public IEnumerator<T> GetEnumerator()
     {
