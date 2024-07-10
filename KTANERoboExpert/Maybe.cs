@@ -33,7 +33,7 @@ public readonly struct Maybe<T> : IEnumerable<T>
     /// </summary>
     public Maybe() { }
 
-    public IEnumerator<T> GetEnumerator()
+    IEnumerator<T> IEnumerable<T>.GetEnumerator()
     {
         if (Exists)
             yield return Item;
