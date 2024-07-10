@@ -59,8 +59,7 @@ public partial class Wires : RoboExpertModule
             case 4:
                 if (colors.Count(s => s == "red") > 1 && Edgework.SerialNumber == null)
                 {
-                    RequestEdgeworkFill(EdgeworkType.SerialNumber, () => ProcessCommand(command));
-                    _checkingEdgework = true;
+                    CheckSN(command);
                     break;
                 }
                 if (colors.Count(s => s == "red") > 1 && (Edgework.SerialNumber![5] - '0') % 2 == 1)
@@ -76,8 +75,7 @@ public partial class Wires : RoboExpertModule
             case 5:
                 if (colors[4] == "black" && Edgework.SerialNumber == null)
                 {
-                    RequestEdgeworkFill(EdgeworkType.SerialNumber, () => ProcessCommand(command));
-                    _checkingEdgework = true;
+                    CheckSN(command);
                     break;
                 }
                 if (colors[4] == "black" && (Edgework.SerialNumber![5] - '0') % 2 == 1)
@@ -93,8 +91,7 @@ public partial class Wires : RoboExpertModule
             case 6:
                 if (!colors.Contains("yellow") && Edgework.SerialNumber == null)
                 {
-                    RequestEdgeworkFill(EdgeworkType.SerialNumber, () => ProcessCommand(command));
-                    _checkingEdgework = true;
+                    CheckSN(command);
                     break;
                 }
                 if (!colors.Contains("yellow") && (Edgework.SerialNumber![5] - '0') % 2 == 1)
@@ -111,6 +108,12 @@ public partial class Wires : RoboExpertModule
                 SpeakSync("Pardon?");
                 break;
         }
+    }
+
+    private void CheckSN(string command)
+    {
+        RequestEdgeworkFill(EdgeworkType.SerialNumber, () => ProcessCommand(command), () => _checkingEdgework = false);
+        _checkingEdgework = true;
     }
 
     public override void Reset() => _checkingEdgework = false;

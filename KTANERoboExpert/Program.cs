@@ -15,6 +15,7 @@ internal static partial class Program
     private static RoboExpertModule[] _modules;
     private static Edgework _edgework = Edgework.Unspecified;
     private static Action _edgeworkCallback = () => { };
+    private static Action? _edgeworkCancel;
     private static RoboExpertModule.EdgeworkType? _edgeworkQuery;
 
 #if DEBUG
@@ -159,7 +160,7 @@ internal static partial class Program
         edgeworkPieces.Add(strike);
         edgeworkPieces.Add(indicatorsc);
 
-        RoboExpertAPI.OnRequestEdgeworkFill += (type, callback) =>
+        RoboExpertAPI.OnRequestEdgeworkFill += (type, callback, onCancel) =>
         {
             if (type switch
             {
@@ -204,6 +205,7 @@ internal static partial class Program
                 _contexts.Push(new Context(null, g));
 
                 _edgeworkCallback = callback;
+                _edgeworkCancel = onCancel;
             });
         };
 
@@ -349,6 +351,8 @@ internal static partial class Program
                     _contexts.Peek().Module?.Cancel();
                     ExitSubmenu();
                     Load(() => Speak("cancelled"));
+                    _edgeworkCancel?.Invoke();
+                    _edgeworkCancel = null;
                 }
             }
             else if (e.Result.Text == "strike")
@@ -360,6 +364,7 @@ internal static partial class Program
         else if (_edgeworkGrammars.Contains(e.Result.Grammar))
         {
             FillEdgework(e.Result.Text, e.Result.Grammar != _edgeworkGrammar ? _edgeworkCallback : null);
+            _edgeworkCancel = null;
         }
         else if (e.Result.Grammar == _defaultGrammar)
         {
@@ -505,7 +510,7 @@ internal static partial class Program
         {
             ExitSubmenu();
             callback.Invoke();
-            callback = null;
+            _edgeworkCancel = null;
         }
     }
 

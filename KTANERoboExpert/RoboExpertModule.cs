@@ -58,7 +58,8 @@ public abstract class RoboExpertModule
     /// </summary>
     /// <param name="type">The piece of edgework to request.</param>
     /// <param name="callback">The callback to be invoked once the edgework has been supplied.</param>
-    protected static void RequestEdgeworkFill(EdgeworkType type, Action callback) => RoboExpertAPI.RequestEdgeworkFill(type, callback);
+    /// <param name="onCancel">The callback to be invoked if the edgework is not supplied.</param>
+    protected static void RequestEdgeworkFill(EdgeworkType type, Action callback, Action? onCancel = null) => RoboExpertAPI.RequestEdgeworkFill(type, callback, onCancel ?? (() => {}));
     /// <summary>
     /// The NATO phonetic alphabet.
     /// </summary>
