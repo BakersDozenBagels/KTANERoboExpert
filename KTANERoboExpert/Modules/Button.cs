@@ -9,22 +9,7 @@ public partial class Button : RoboExpertModule
     public override string Help => "red abort";
     private Grammar? _grammar, _subGrammar;
     public override Grammar Grammar => _grammar ??= new(new GrammarBuilder(new Choices("red", "yellow", "white", "blue")).Then(new Choices("abort", "detonate", "hold", "press")));
-    private Grammar SubGrammar
-    {
-        get
-        {
-            if (_subGrammar != null)
-                return _subGrammar;
-
-            var colors = new Choices();
-            colors.Add("red");
-            colors.Add("yellow");
-            colors.Add("white");
-            colors.Add("blue");
-
-            return _subGrammar = new Grammar(colors);
-        }
-    }
+    private Grammar SubGrammar => _subGrammar ??= new Grammar(new Choices("red", "yellow", "white", "blue"));
 
     private bool _holding = false;
 
