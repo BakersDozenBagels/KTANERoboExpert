@@ -107,7 +107,7 @@ public partial class Button : RoboExpertModule
         RequestEdgeworkFill(type, () => ProcessCommand(command));
     }
 
-    private void Tap()
+    private static void Tap()
     {
         Speak("Tap");
         ExitSubmenu();
