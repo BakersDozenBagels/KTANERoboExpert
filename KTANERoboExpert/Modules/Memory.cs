@@ -8,25 +8,7 @@ public partial class Memory : RoboExpertModule
     public override string Name => "Memory";
     public override string Help => "3 1 4 2 3 | reset | undo | redo";
     private Grammar? _grammar;
-    public override Grammar Grammar
-    {
-        get
-        {
-            if (_grammar != null)
-                return _grammar;
-
-            var digit = new Choices("1", "2", "3", "4");
-
-            var stage = new GrammarBuilder(digit, 5, 5);
-
-            var choices = new Choices(stage);
-            choices.Add("undo");
-            choices.Add("redo");
-            choices.Add("reset");
-
-            return _grammar = new Grammar(choices);
-        }
-    }
+    public override Grammar Grammar => _grammar ??= new(new Choices(new GrammarBuilder(new Choices("1", "2", "3", "4"), 5, 5), "undo", "redo", "reset"));
 
     private readonly UndoStack<Stage[]> _undoHistory = new([]);
     private Stage[] Stages => _undoHistory.Current;
