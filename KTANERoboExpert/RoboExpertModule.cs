@@ -59,11 +59,11 @@ public abstract class RoboExpertModule
     /// <param name="type">The piece of edgework to request.</param>
     /// <param name="callback">The callback to be invoked once the edgework has been supplied.</param>
     /// <param name="onCancel">The callback to be invoked if the edgework is not supplied.</param>
-    protected static void RequestEdgeworkFill(EdgeworkType type, Action callback, Action? onCancel = null) => RoboExpertAPI.RequestEdgeworkFill(type, callback, onCancel ?? (() => {}));
+    protected static void RequestEdgeworkFill(EdgeworkType type, Action? callback = null, Action? onCancel = null) => RoboExpertAPI.RequestEdgeworkFill(type, callback ?? (() => { }), onCancel ?? (() => { }));
     /// <summary>
     /// The NATO phonetic alphabet.
     /// </summary>
-    protected internal static readonly IReadOnlyCollection<string> NATO = [ "alfa", "bravo", "charlie", "delta", "echo", "foxtrot", "golf", "hotel", "india", "juliet", "kilo", "lima", "mike", "november", "oscar", "papa", "quebec", "romeo", "sierra", "tango", "uniform", "victor", "whiskey", "xray", "yankee", "zulu" ];
+    protected internal static readonly IReadOnlyCollection<string> NATO = ["alfa", "bravo", "charlie", "delta", "echo", "foxtrot", "golf", "hotel", "india", "juliet", "kilo", "lima", "mike", "november", "oscar", "papa", "quebec", "romeo", "sierra", "tango", "uniform", "victor", "whiskey", "xray", "yankee", "zulu"];
 
     /// <summary>
     /// The name of the module this class solves.

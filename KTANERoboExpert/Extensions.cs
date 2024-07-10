@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Speech.Recognition;
+using System.Text;
 
 namespace KTANERoboExpert;
 
@@ -34,4 +35,12 @@ internal static class Extensions
         }
         return sb.Append(lastSep).Append(prev).ToString();
     }
+
+    public static GrammarBuilder Then(this GrammarBuilder builder, GrammarBuilder other)
+    {
+        builder.Append(other);
+        return builder;
+    }
+
+    public static bool HasSerialNumberVowel(this Edgework edgework) => edgework.SerialNumber!.Any("AEIOU".Contains);
 }
