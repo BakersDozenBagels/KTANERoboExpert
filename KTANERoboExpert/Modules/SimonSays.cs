@@ -37,7 +37,7 @@ public class SimonSays : RoboExpertModule
             "green" => names[table[2]],
             "yellow" => names[table[3]],
             _ => throw new UnreachableException($"Unexpected color {p}")
-        }).Join(" "));
+        }).Conjoin());
     }
 
     public override void Select()

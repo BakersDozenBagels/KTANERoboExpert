@@ -19,7 +19,7 @@ public class Password : RoboExpertModule
         var parts = command.ToLowerInvariant().Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(s => s[0]);
         var first = parts.Take(6).ToArray();
         var third = parts.Skip(7).ToArray();
-        Speak(_passwords.Where(p => first.Contains(p[0]) && third.Contains(p[2])).Conjoin(lastSep: ", or "));
+        Speak(_passwords.Where(p => first.Contains(p[0]) && third.Contains(p[2])).Conjoin(", ", ", or "));
         ExitSubmenu();
     }
 

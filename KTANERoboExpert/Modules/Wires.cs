@@ -18,7 +18,7 @@ public partial class Wires : RoboExpertModule
 
         string[] ord = ["first", "second", "third", "fourth", "fifth", "sixth"];
         if (!_checkingEdgework)
-            SpeakSSML("<prosody rate=\"+40%\">" + colors.Select(c => c == "black" ? "k" : c[0].ToString()).Join(" ") + "</prosody>");
+            SpeakSSML("<prosody rate=\"+40%\">" + colors.Select(c => c == "black" ? "k" : c[0].ToString()).Conjoin() + "</prosody>");
         _checkingEdgework = false;
 
         switch (colors.Length)

@@ -30,7 +30,7 @@ public sealed class UndoStack<T>(T baseState)
     public void NewModule() => AddItem(new(_baseState, true));
     private void AddItem(HistoryNode item)
     {
-        _history.RemoveRangeQuietly(_pointer + 1, _history.Count);
+        _history.RemoveRangeQuietly(_pointer + 1);
         _history.Add(item);
         _pointer++;
     }

@@ -465,10 +465,10 @@ internal static partial class Program
                 .Split(' ')
                 .Skip(_edgeworkQuery == RoboExpertModule.EdgeworkType.SerialNumber ? 0 : 1)
                 .Select(s => alpha[Array.IndexOf(lookup, s) is var x && x is -1 ? 36 : x].ToString())
-                .Join()
+                .Conjoin(string.Empty)
             };
 
-            Speak(_edgework.SerialNumber.Select(c => c.ToString()).Join(" "));
+            Speak(_edgework.SerialNumber.Select(c => c.ToString()).Conjoin());
         }
         if (_edgeworkQuery == RoboExpertModule.EdgeworkType.Batteries || (_edgeworkQuery == null && BatteryRegex().IsMatch(command)))
         {
