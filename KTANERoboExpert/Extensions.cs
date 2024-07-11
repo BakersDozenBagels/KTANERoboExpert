@@ -16,7 +16,8 @@ internal static class Extensions
     {
         if (start >= list.Count)
             return;
-        list.RemoveRange(Math.Max(start, 0), Math.Min(count, list.Count - start));
+        start = Math.Max(start, 0);
+        list.RemoveRange(start, Math.Clamp(count, 0, list.Count - start));
     }
 
     /// <summary>

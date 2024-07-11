@@ -158,10 +158,7 @@ public partial class Memory : RoboExpertModule
 
     private void Label(int v) => Position(Array.IndexOf(Stages.Last().Buttons, v) + 1);
 
-    public override void Reset()
-    {
-        _undoHistory.Clear();
-    }
+    public override void Reset() => _undoHistory.Clear();
 
     [GeneratedRegex("([1-5]) ([1-5]) ([1-5]) ([1-5]) ([1-5])", RegexOptions.Compiled)]
     private static partial Regex CommandMatcher();
