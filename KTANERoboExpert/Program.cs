@@ -228,7 +228,7 @@ internal static partial class Program
         ProcessCommand("start");
 #endif
 
-        while (ProcessCommand(Console.ReadLine() ?? "")) { }
+        while (Console.ReadLine() is { } command && ProcessCommand(command)) { }
     }
 
     private static bool ProcessCommand(string cmd)
