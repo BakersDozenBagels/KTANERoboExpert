@@ -515,7 +515,10 @@ internal static partial class Program
             if (command.StartsWith("ports "))
                 command = command[6..];
             if (command == "none")
+            {
                 _edgework = _edgework with { Ports = [] };
+                Speak("0 port plates");
+            }
             else
             {
                 static Maybe<Edgework.PortPlate> Parse(string parts)
@@ -530,12 +533,13 @@ internal static partial class Program
                     ));
                 }
                 var plates = command[..^5]
-                    .Split("plate", StringSplitOptions.RemoveEmptyEntries)
+                    .Split("plate", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                     .Select(Parse)
                     .ToArray();
                 if (plates.Any(p => !p.Exists))
                     return;
-                _edgework = _edgework with { Ports = [..plates.Select(x => x.Item)] };
+                _edgework = _edgework with { Ports = [.. plates.Select(x => x.Item)] };
+                Speak(plates.Length + " port plate" + (plates.Length > 1 ? "s" : ""));
             }
         }
         else if (_edgeworkQuery == null && command.StartsWith("strike"))
