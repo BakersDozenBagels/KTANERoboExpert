@@ -106,7 +106,6 @@ public class Maze : RoboExpertModule
         Speak(path[1..]);
     }
 
-    public override void Cancel() => Reset();
     public override void Reset() => _data = null;
 
     private readonly record struct MazeData(int Maze, int Col, int Row);
