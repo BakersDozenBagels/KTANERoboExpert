@@ -9,7 +9,7 @@ public class Maze : RoboExpertModule
     public override string Name => "Maze";
     public override string Help => "circle A1 circle B2 square C3 triangle D4";
     private Grammar? _grammar;
-    public override Grammar Grammar => _grammar ??= new(new GrammarBuilder(Extensions.Append(Extensions.Append(new Choices("circle", "square", "triangle").ToGrammarBuilder(), new Choices(NATO.Take(6).ToArray())), new Choices("1", "2", "3", "4", "5", "6")), 1, 4));
+    public override Grammar Grammar => _grammar ??= new(new GrammarBuilder(new Choices("circle", "square", "triangle").ToGrammarBuilder() + new Choices(NATO.Take(6).ToArray()) + new Choices("1", "2", "3", "4", "5", "6"), 1, 4));
 
     private MazeData? _data;
 

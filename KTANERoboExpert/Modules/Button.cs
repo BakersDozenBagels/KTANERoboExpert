@@ -8,7 +8,7 @@ public partial class Button : RoboExpertModule
     public override string Name => "Button";
     public override string Help => "red abort";
     private Grammar? _grammar, _subGrammar;
-    public override Grammar Grammar => _grammar ??= new(Extensions.Append(new GrammarBuilder(new Choices("red", "yellow", "white", "blue")), new Choices("abort", "detonate", "hold", "press")));
+    public override Grammar Grammar => _grammar ??= new(new GrammarBuilder(new Choices("red", "yellow", "white", "blue")) + new Choices("abort", "detonate", "hold", "press"));
     private Grammar SubGrammar => _subGrammar ??= new Grammar(new Choices("red", "yellow", "white", "blue"));
 
     private bool _holding = false;

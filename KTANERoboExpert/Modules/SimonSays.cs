@@ -8,7 +8,7 @@ public class SimonSays : RoboExpertModule
     public override string Name => "Simon Says";
     public override string Help => "Red Red Yellow Green Done";
     private Grammar? _grammar;
-    public override Grammar Grammar => _grammar ??= new(Extensions.Append(new GrammarBuilder(new Choices("red", "yellow", "green", "blue"), 1, 5), "done"));
+    public override Grammar Grammar => _grammar ??= new(new GrammarBuilder(new Choices("red", "yellow", "green", "blue"), 1, 5) + "done");
 
     public override void ProcessCommand(string command)
     {

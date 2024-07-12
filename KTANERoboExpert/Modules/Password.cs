@@ -7,7 +7,7 @@ public class Password : RoboExpertModule
     public override string Name => "Password";
     public override string Help => "[6 letters] next [6 letters]";
     private Grammar? _grammar;
-    public override Grammar Grammar => _grammar ??= new(Extensions.Append(Extensions.Append(new GrammarBuilder(new Choices(NATO.ToArray()), 6, 6), "next"), new(new Choices(NATO.ToArray()), 6, 6)));
+    public override Grammar Grammar => _grammar ??= new(new GrammarBuilder(new Choices(NATO.ToArray()), 6, 6) + "next" + new GrammarBuilder(new Choices(NATO.ToArray()), 6, 6));
 
     public override void Select()
     {

@@ -47,18 +47,6 @@ internal static class Extensions
     }
 
     /// <summary>
-    /// Calls <see cref="GrammarBuilder.Append(GrammarBuilder)"/> and returns <paramref name="builder"/>.
-    /// </summary>
-    /// <param name="builder">The builder to append to</param>
-    /// <param name="other">The builder to be appended</param>
-    /// <returns><paramref name="builder"/></returns>
-    public static GrammarBuilder Append(this GrammarBuilder builder, GrammarBuilder other)
-    {
-        builder.Append(other);
-        return builder;
-    }
-
-    /// <summary>
     /// Tests whether the serial number has a vowel. This does not include Y.
     /// </summary>
     /// <exception cref="NullReferenceException">Thrown when the serial number is unknown.</exception>

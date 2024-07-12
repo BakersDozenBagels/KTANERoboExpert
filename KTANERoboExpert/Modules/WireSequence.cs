@@ -8,7 +8,7 @@ public class WireSequence : RoboExpertModule
     public override string Name => "Wire Sequence";
     public override string Help => "Red A Blue B";
     private Grammar? _grammar;
-    public override Grammar Grammar => _grammar ??= new(new Choices(new GrammarBuilder(Extensions.Append(Extensions.Append(new Choices("red", "blue", "black").ToGrammarBuilder(), new("to", 0, 1)), new Choices(NATO.Take(3).ToArray())), 1, 3), "undo", "redo", "reset"));
+    public override Grammar Grammar => _grammar ??= new(new Choices(new GrammarBuilder(new Choices("red", "blue", "black") + new GrammarBuilder("to", 0, 1) + new Choices(NATO.Take(3).ToArray()), 1, 3), "undo", "redo", "reset"));
 
     private readonly UndoStack<State> _undo = new(default);
 
