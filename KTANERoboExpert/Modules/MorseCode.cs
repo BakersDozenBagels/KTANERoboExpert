@@ -6,9 +6,9 @@ namespace KTANERoboExpert.Modules;
 public class MorseCode : RoboExpertModule
 {
     public override string Name => "Morse Code";
-    public override string Help => "go dot dash next | repeat | reset";
+    public override string Help => "go dot dash done | repeat | reset";
     private Grammar? _grammar;
-    public override Grammar Grammar => _grammar ??= new(new Choices("go" + new GrammarBuilder(new Choices("dot", "dash"), 1, 4) + "next", "repeat", "reset"));
+    public override Grammar Grammar => _grammar ??= new(new Choices("go" + new GrammarBuilder(new Choices("dot", "dash"), 1, 4) + "done", "repeat", "reset"));
     private string _soFar = string.Empty;
 
     public override void ProcessCommand(string command)
