@@ -1,5 +1,6 @@
 ﻿using KTANERoboExpert;
 using System.Diagnostics;
+using System.Linq;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
 using System.Text.RegularExpressions;
@@ -154,11 +155,23 @@ internal static partial class Program
         var indicators = new Grammar(indicatorsc);
         _edgeworkGrammars.Add(indicators);
 
+        var psPlate = new Choices("parallel", "serial", "parallel serial", "serial parallel");
+        var fullPlate = new GrammarBuilder(new Choices("DVI", "PS", "RJ", "RCA"), 1, 4);
+        var anyPlate = new Choices(psPlate, fullPlate, "empty");
+        var ports = new Choices("none", new GrammarBuilder("plate" + anyPlate.ToGrammarBuilder(), 1, 10) + "done");
+        var portsGrammar = new Grammar(ports);
+        var portsMenu = "ports" + ports.ToGrammarBuilder();
+        _edgeworkGrammars.Add(portsGrammar);
+
         var edgeworkPieces = new Choices();
         edgeworkPieces.Add(serialb2);
         edgeworkPieces.Add(batteriesb);
         edgeworkPieces.Add(strike);
         edgeworkPieces.Add(indicatorsc);
+        edgeworkPieces.Add(portsMenu);
+
+        _edgeworkGrammar = new Grammar(edgeworkPieces.ToGrammarBuilder());
+        _edgeworkGrammars.Add(_edgeworkGrammar);
 
         RoboExpertAPI.OnRequestEdgeworkFill += (type, callback, onCancel) =>
         {
@@ -186,7 +199,7 @@ internal static partial class Program
                     RoboExpertModule.EdgeworkType.SerialNumber => serial,
                     RoboExpertModule.EdgeworkType.Batteries => batteries,
                     RoboExpertModule.EdgeworkType.Indicators => indicators,
-                    RoboExpertModule.EdgeworkType.Ports => throw new NotImplementedException(),
+                    RoboExpertModule.EdgeworkType.Ports => portsGrammar,
                     _ => throw new ArgumentException("Bad edgework type", nameof(type)),
                 };
                 _edgeworkQuery = type;
@@ -208,9 +221,6 @@ internal static partial class Program
                 _edgeworkCancel = onCancel;
             });
         };
-
-        _edgeworkGrammar = new Grammar(edgeworkPieces.ToGrammarBuilder());
-        _edgeworkGrammars.Add(_edgeworkGrammar);
 
         _microphone.LoadGrammar(_defaultGrammar);
         _microphone.LoadGrammar(_globalGrammar);
@@ -470,7 +480,7 @@ internal static partial class Program
 
             Speak(_edgework.SerialNumber.Select(c => c.ToString()).Conjoin());
         }
-        if (_edgeworkQuery == RoboExpertModule.EdgeworkType.Batteries || (_edgeworkQuery == null && BatteryRegex().IsMatch(command)))
+        else if (_edgeworkQuery == RoboExpertModule.EdgeworkType.Batteries || (_edgeworkQuery == null && BatteryRegex().IsMatch(command)))
         {
             var match = BatteryRegex().Match(command);
             _edgework = _edgework with
@@ -500,7 +510,35 @@ internal static partial class Program
 
             Speak(_edgework.Indicators.Count + " indicator" + (_edgework.Indicators.Count == 1 ? "" : "s"));
         }
-        else if (command.StartsWith("strike"))
+        else if (_edgeworkQuery == RoboExpertModule.EdgeworkType.Ports || (_edgeworkQuery == null && command.StartsWith("ports ")))
+        {
+            if (command.StartsWith("ports "))
+                command = command[6..];
+            if (command == "none")
+                _edgework = _edgework with { Ports = [] };
+            else
+            {
+                static Maybe<Edgework.PortPlate> Parse(string parts)
+                {
+                    var ports = parts.Split(' ');
+                    if (ports.Length != ports.Distinct().Count())
+                        return new();
+                    return new(new(
+                        ports.Contains("DVI"), ports.Contains("parallel"),
+                        ports.Contains("PS"), ports.Contains("RJ"),
+                        ports.Contains("serial"), ports.Contains("RCA")
+                    ));
+                }
+                var plates = command[..^5]
+                    .Split("plate", StringSplitOptions.RemoveEmptyEntries)
+                    .Select(Parse)
+                    .ToArray();
+                if (plates.Any(p => !p.Exists))
+                    return;
+                _edgework = _edgework with { Ports = [..plates.Select(x => x.Item)] };
+            }
+        }
+        else if (_edgeworkQuery == null && command.StartsWith("strike"))
         {
             _edgework = _edgework with { Strikes = int.Parse(command[7..]) };
             Speak(command[7..] + "strikes");
