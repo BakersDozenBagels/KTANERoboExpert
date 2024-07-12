@@ -12,7 +12,7 @@ internal static class Extensions
     /// <param name="list">The list to remove from</param>
     /// <param name="start">The first element to remove</param>
     /// <param name="count">The number of elements to remove</param>
-    public static void RemoveRangeQuietly<T>(this List<T> list, int start, int count = int.MaxValue)
+    public static void GuardedRemoveRange<T>(this List<T> list, int start, int count = int.MaxValue)
     {
         if (start >= list.Count)
             return;
@@ -52,7 +52,7 @@ internal static class Extensions
     /// <param name="builder">The builder to append to</param>
     /// <param name="other">The builder to be appended</param>
     /// <returns><paramref name="builder"/></returns>
-    public static GrammarBuilder Then(this GrammarBuilder builder, GrammarBuilder other)
+    public static GrammarBuilder Append(this GrammarBuilder builder, GrammarBuilder other)
     {
         builder.Append(other);
         return builder;

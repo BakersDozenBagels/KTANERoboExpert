@@ -7,7 +7,7 @@ namespace KTANERoboExpert;
 /// Represents an item which may or may not be present.
 /// </summary>
 /// <typeparam name="T">The type of item</typeparam>
-public readonly struct Maybe<T> : IEnumerable<T>
+public readonly struct Maybe<T> : IEnumerable<T>, IOrderedEnumerable<T>
 {
     /// <summary>
     /// <see langword="true"/> when the item exists, <see langword="false"/> otherwise.
@@ -33,15 +33,17 @@ public readonly struct Maybe<T> : IEnumerable<T>
     /// </summary>
     public Maybe() { }
 
-    IEnumerator<T> IEnumerable<T>.GetEnumerator()
+    public IEnumerator<T> GetEnumerator()
     {
         if (Exists)
             yield return Item;
     }
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        if (Exists)
-            yield return Item;
-    }
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    IOrderedEnumerable<T> IOrderedEnumerable<T>.CreateOrderedEnumerable<TKey>(
+        Func<T, TKey> keySelector, 
+        IComparer<TKey>? comparer,
+        bool descending
+    ) => this;
 }

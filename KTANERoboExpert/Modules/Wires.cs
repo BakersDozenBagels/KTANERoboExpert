@@ -8,7 +8,7 @@ public partial class Wires : RoboExpertModule
     public override string Name => "Wires";
     public override string Help => "red blue yellow black done";
     private Grammar? _grammar;
-    public override Grammar Grammar => _grammar ??= new(new GrammarBuilder(new Choices("red", "yellow", "black", "white", "blue").ToGrammarBuilder().Then(new("wire", 0, 1)), 3, 6).Then("done"));
+    public override Grammar Grammar => _grammar ??= new(Extensions.Append(new GrammarBuilder(Extensions.Append(new Choices("red", "yellow", "black", "white", "blue").ToGrammarBuilder(), new("wire", 0, 1)), 3, 6), "done"));
 
     private bool _checkingEdgework = false;
 
