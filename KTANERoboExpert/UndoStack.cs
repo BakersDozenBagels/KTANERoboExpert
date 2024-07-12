@@ -1,4 +1,6 @@
-﻿namespace KTANERoboExpert;
+﻿using System.Diagnostics;
+
+namespace KTANERoboExpert;
 
 /// <summary>
 /// Represents an undo stack spanning multiple modules of one type.
@@ -25,9 +27,15 @@ public sealed class UndoStack<T>(T baseState)
     /// <param name="item">The new state</param>
     public void Do(T item) => AddItem(new(item, false));
     /// <summary>
-    /// Starts a new module instance. <see cref="Reset"/> will return here. This can be undone past.
+    /// Starts a new module instance.
+    /// <see cref="Reset"/> will return here. This can be undone past.
     /// </summary>
     public void NewModule() => AddItem(new(_baseState, true));
+    /// <summary>
+    /// Starts a new module instance with the given starting state.
+    /// <see cref="Reset"/> will return here. This can be undone past.
+    /// </summary>
+    public void NewModule(T item) => AddItem(new(item, true));
     private void AddItem(HistoryNode item)
     {
         _history.GuardedRemoveRange(_pointer + 1);
@@ -53,9 +61,15 @@ public sealed class UndoStack<T>(T baseState)
         if (_history[_pointer].Reset)
             return new();
         for (int i = _pointer - 1; i >= 0; i--)
+        {
             if (_history[i].Reset)
+            {
                 AddItem(_history[i]);
-        return new(Current);
+                return new(_history[i].Frame);
+            }
+        }
+
+        throw new UnreachableException();
     }
     /// <summary>
     /// Fully resets the stack. For a module instance reset, use <see cref="Reset"/>.
