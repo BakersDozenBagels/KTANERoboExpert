@@ -53,4 +53,12 @@ internal static class Extensions
     /// <param name="edgework">The edgework to test</param>
     /// <returns><see langword="true"/> if the serial number has a vowel, <see cref="false"/> otherwise.</returns>
     public static bool HasSerialNumberVowel(this Edgework edgework) => edgework.SerialNumber!.Any("AEIOU".Contains);
+    /// <summary>
+    /// Gets the numeric digits in the serial number.
+    /// </summary>
+    /// <exception cref="NullReferenceException">Thrown when the serial number is unknown.</exception>
+    /// <param name="edgework">The edgework to test</param>
+    /// <returns>The numeric digits in the serial number</returns>
+    public static IEnumerable<int> SerialNumberDigits(this Edgework edgework) =>
+        edgework.SerialNumber!.Where("0123456789".Contains).Select(c => int.Parse(c.ToString()));
 }
