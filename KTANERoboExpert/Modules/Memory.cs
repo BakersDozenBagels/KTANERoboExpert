@@ -145,7 +145,7 @@ public partial class Memory : RoboExpertModule
 
     private void Position(int v)
     {
-        Speak($"position {v}{(Stages.Length == 5 ? "" : $". on to stage {Stages.Length}")}");
+        Speak($"position {v}{(Stages.Length == 5 ? "" : $". on to stage {Stages.Length + 1}")}");
         Stages[^1] = Stages[^1] with { Press = v - 1 };
         if (Stages.Length == 5)
         {

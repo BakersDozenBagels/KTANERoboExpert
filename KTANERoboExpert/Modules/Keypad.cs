@@ -19,6 +19,7 @@ public class Keypad : RoboExpertModule
             return;
         }
         Speak(col.Where(symbols.Contains).Select(s => (Array.IndexOf(symbols, s) + 1).ToString()).Conjoin());
+        ExitSubmenu();
     }
 
     private static readonly Dictionary<string, int> _symbolNames = new()

@@ -8,13 +8,24 @@ public class WhosOnFirst : RoboExpertModule
     public override string Help => "YES then READY then FIRST then NO then BLANK then NOTHING then YES done";
     private Grammar? _grammar;
     public override Grammar Grammar => _grammar ??= new(new Choices(_displayPhrases.Keys.ToArray()) + new GrammarBuilder("then" + new Choices(_buttonPhrases.Keys.ToArray()).ToGrammarBuilder(), 6, 6) + "done");
+    private int _stagesDone;
 
     public override void ProcessCommand(string command)
     {
         var parts = command[..^5].Split(" then ");
-        parts = [_displayPhrases[parts[0]], ..parts[1..].Select(p => _buttonPhrases[p])];
-        Speak("Press " + Array.IndexOf(parts, _lists[parts[_eyes[parts[0]] + 1]].First(parts[1..].Contains)));
+        parts = [_displayPhrases[parts[0]], .. parts[1..].Select(p => _buttonPhrases[p])];
+        Speak("Press " + (Array.IndexOf(parts[1..], _lists[parts[_eyes[parts[0]] + 1]].First(parts[1..].Contains)) + 1));
+        _stagesDone++;
+        if (_stagesDone == 3)
+        {
+            _stagesDone = 0;
+            ExitSubmenu();
+        }
     }
+
+    public override void Select() => Speak("Go on Who's on First stage " + (_stagesDone + 1));
+
+    public override void Reset() => _stagesDone = 0;
 
     // _displayPhrases and _eyes could in theory be merged into one lookup
     // _buttonPhrases and _lists can't be merged this way

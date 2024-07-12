@@ -61,7 +61,10 @@ public class WireSequence : RoboExpertModule
                 }
 
                 if (newState.Stage >= 10)
+                {
                     _undo.NewModule();
+                    ExitSubmenu();
+                }
                 else
                     _undo.Do(newState);
 
