@@ -30,7 +30,8 @@ public class SimonSays : RoboExpertModule
                 (false, _) => [3, 2, 1, 0],
             };
 
-        Speak(command.Split(' ', StringSplitOptions.RemoveEmptyEntries).SkipLast(1).Select(p => p switch
+        var colors = command.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        Speak(colors.SkipLast(1).Select(p => p switch
         {
             "red" => names[table[0]],
             "blue" => names[table[1]],
@@ -38,6 +39,8 @@ public class SimonSays : RoboExpertModule
             "yellow" => names[table[3]],
             _ => throw new UnreachableException($"Unexpected color {p}")
         }).Conjoin());
+        if (colors.Length == 5)
+            ExitSubmenu();
     }
 
     public override void Select()

@@ -54,7 +54,7 @@ public class ComplicatedWires : RoboExpertModule
         var b = parts.Count(x => x == "blue");
         var l = parts.Count(x => x == "light");
         var s = parts.Count(x => x == "star");
-        if (w is > 1 || r is > 1 || b is > 1 || l > 1 || s > 1 || w is 1 && (b is not 0 || r is not 0))
+        if (w is > 1 || r is > 1 || b is > 1 || l > 1 || s > 1 || w is 1 && (b is not 0 && r is not 0) || (w is 0 && r is 0 && b is 0))
             return new();
 
         return new((r == 1, b == 1, l == 1, s == 1) switch
