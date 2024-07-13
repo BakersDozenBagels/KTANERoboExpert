@@ -9,6 +9,9 @@ public class VentingGas : RoboExpertModule
     private Grammar? _grammar;
     public override Grammar Grammar => _grammar ??= new(new Choices("vent gas", "detonate"));
 
-    public override void ProcessCommand(string command) =>
+    public override void ProcessCommand(string command)
+    {
         Speak(command == "detonate" ? "Press no" : "Press yes");
+        ExitSubmenu();
+    }
 }
