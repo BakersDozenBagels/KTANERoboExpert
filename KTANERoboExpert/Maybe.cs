@@ -42,7 +42,7 @@ public readonly struct Maybe<T> : IEnumerable<T>, IOrderedEnumerable<T>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     IOrderedEnumerable<T> IOrderedEnumerable<T>.CreateOrderedEnumerable<TKey>(
-        Func<T, TKey> keySelector, 
+        Func<T, TKey> keySelector,
         IComparer<TKey>? comparer,
         bool descending
     ) => this;
