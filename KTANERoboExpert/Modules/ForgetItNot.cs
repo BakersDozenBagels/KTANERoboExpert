@@ -55,7 +55,7 @@ public partial class ForgetItNot : RoboExpertModule
                 if (s.IsCertain)
                     Speak(s.Value.ToString());
                 else
-                    s.Fill(() => { });
+                    Speak("Guess");
             }
         }
         else if (StageRegex().Match(command) is { Success: true, Groups: [_, var ixs, var stages, var digits] } && int.Parse(stages.Value) is var stage && int.Parse(digits.Value) is var digit)
@@ -96,11 +96,7 @@ public partial class ForgetItNot : RoboExpertModule
         }
     }
 
-    private static void AskStage(Action a, Action? _)
-    {
-        Speak("Guess");
-        a();
-    }
+    private static void AskStage(Action a, Action? _) { }
 
     public void HandleSolve(string? _)
     {

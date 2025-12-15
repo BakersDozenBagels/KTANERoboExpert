@@ -67,7 +67,7 @@ internal static class Extensions
     /// </summary>
     public static void SparseSet<T>(this List<T> l, int index, T value, Func<int, T> @default)
     {
-        for (int i = l.Count; i < index - 1; i++)
+        for (int i = l.Count; i < index; i++)
             l.Add(@default(i));
         if (l.Count > index)
             l[index] = value;
