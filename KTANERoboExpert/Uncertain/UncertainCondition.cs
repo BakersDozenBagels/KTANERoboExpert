@@ -16,7 +16,7 @@ namespace KTANERoboExpert.Uncertain
         [MemberNotNullWhen(true, nameof(Value))]
         public bool IsCertain { get => Exhaustive && Reduce().Count() is 1; }
         /// <summary>
-        /// Evert possible outcome of this condition chain.
+        /// Every possible outcome of this condition chain.
         /// </summary>
         public IEnumerable<T> Possibilities { get => Reduce().Select(tup => tup.Item2); }
         /// <summary>
