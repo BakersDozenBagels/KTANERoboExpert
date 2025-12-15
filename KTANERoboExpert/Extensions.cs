@@ -81,15 +81,30 @@ internal static class Extensions
     public static UncertainBool Matches<T>(this IUncertain<T> u, Func<T, UncertainBool> predicate) =>
         u.IsCertain ? predicate(u.Value!) : new(u.Fill);
 
+    public static IUncertain<U> Map<T, U>(this IUncertain<T> u, Func<T, U> map) => u.IsCertain ? map(u.Value!) : new Uncertain<U>(u.Fill);
+    public static IUncertain<U> FlatMap<T, U>(this IUncertain<T> u, Func<T, IUncertain<U>> map) => u.IsCertain ? map(u.Value!) : new Uncertain<U>(u.Fill);
+    public static T OrElse<T>(this IUncertain<T> u, T value) => u.IsCertain ? u.Value! : value;
+
     /// <summary>
-    /// Tests whether the serial number has a vowel. This does not include Y.
+    /// Gets the letters in the serial number.
     /// </summary>
-    public static UncertainBool HasSerialNumberVowel(this Edgework edgework) => edgework.SerialNumber.Matches(s => s.Any("AEIOU".Contains));
+    public static UncertainEnumerable<char> SerialNumberLetters(this Edgework edgework) =>
+        edgework.SerialNumber.Map(s => new UncertainEnumerable<char>(s.Where(c => !"0123456789".Contains(c)))).OrElse(new(edgework.SerialNumber.Fill, 2, 4));
+    /// <summary>
+    /// Gets the vowels in the serial number. This does not include Y.
+    /// </summary>
+    public static UncertainEnumerable<char> SerialNumberVowels(this Edgework edgework) =>
+        edgework.SerialNumberLetters().Where("AEIOU".Contains);
+    /// <summary>
+    /// Gets the consonants in the serial number. This does include Y.
+    /// </summary>
+    public static UncertainEnumerable<char> SerialNumberConsonants(this Edgework edgework) =>
+        edgework.SerialNumberLetters().Where(c => !"AEIOU".Contains(c));
     /// <summary>
     /// Gets the numeric digits in the serial number.
     /// </summary>
-    public static Uncertain<IEnumerable<int>> SerialNumberDigits(this Edgework edgework) =>
-        edgework.SerialNumber.IsCertain ? new(edgework.SerialNumber.Value.Where("0123456789".Contains).Select(c => int.Parse(c.ToString()))) : new(edgework.SerialNumber.Fill);
+    public static UncertainEnumerable<int> SerialNumberDigits(this Edgework edgework) =>
+        edgework.SerialNumber.Map(s => new UncertainEnumerable<int>(s.Where("0123456789".Contains).Select(c => int.Parse(c.ToString())))).OrElse(new(edgework.SerialNumber.Fill, 2, 4));
     /// <summary>
     /// Tests whether the bomb has an indicator with the given properties.
     /// </summary>

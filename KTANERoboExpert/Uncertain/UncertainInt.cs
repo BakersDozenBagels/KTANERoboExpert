@@ -29,11 +29,11 @@
         /// <summary>
         /// The minimum value, if known.
         /// </summary>
-        public int Min => _min.Item;
+        public int Min => _min.OrElse(int.MinValue);
         /// <summary>
         /// The maximum value, if known.
         /// </summary>
-        public int Max => _max.Item;
+        public int Max => _max.OrElse(int.MaxValue);
 
         /// <inheritdoc cref="UncertainInt.UncertainInt(int)"/>
         public static UncertainInt Exactly(int value) => new(value);
@@ -99,11 +99,11 @@
         public static implicit operator UncertainInt(int value) => new(value);
 
         public static UncertainInt operator -(UncertainInt u) =>
-            u.IsCertain ? new(-u.Value) : new(u._getValue.Item!, u._min.Map(x => -x), u._max.Map(x => -x ));
+            u.IsCertain ? new(-u.Value) : new(u._getValue.Item!, u._max.Map(x => -x), u._min.Map(x => -x ));
         public static UncertainInt operator ++(UncertainInt u) =>
             u.IsCertain ? new(u.Value + 1) : new(u._getValue.Item!, u._min.Map(x => x + 1), u._max.Map(x => x + 1));
         public static UncertainInt operator --(UncertainInt u) =>
-            u.IsCertain ? new(u.Value - 1) : new(u._getValue.Item!, u._max.Map(x => x - 1), u._min.Map(x => x - 1));
+            u.IsCertain ? new(u.Value - 1) : new(u._getValue.Item!, u._min.Map(x => x - 1), u._max.Map(x => x - 1));
         public static UncertainInt operator +(UncertainInt a, UncertainInt b)
         {
             if (a.IsCertain && b.IsCertain)
@@ -115,6 +115,21 @@
             return new(a._getValue.Item!, a._min.FlatMap(x => b._min.Map(y => x + y)), a._max.FlatMap(x => b._max.Map(y => x + y)));
         }
         public static UncertainInt operator -(UncertainInt a, UncertainInt b) => a + (-b);
+        public static UncertainInt operator *(UncertainInt a, UncertainInt b)
+        {
+            if (a.IsCertain && b.IsCertain)
+                return a.Value * b.Value;
+
+            var w = a._min.Exists ? a._min.Item : int.MinValue;
+            var x = b._min.Exists ? b._min.Item : int.MinValue;
+            var y = a._max.Exists ? a._max.Item : int.MaxValue;
+            var z = b._max.Exists ? b._max.Item : int.MaxValue;
+
+            if (w < 0 || x < 0)
+                throw new NotImplementedException();
+
+            return new(a.IsCertain ? b._getValue.Item! : a._getValue.Item!, w * x, y * z);
+        }
 
         public override bool Equals(object? other) => other is UncertainInt i && Equals(i);
         public bool Equals(UncertainInt? other) => other is not null &&
@@ -123,5 +138,8 @@
                 other._min == _min &&
                 other._max == _max;
         public override int GetHashCode() => HashCode.Combine(_getValue, Value, _min, _max);
+
+        public UncertainInt ButAtMost(UncertainInt max) => IsCertain ? this : new(_getValue.Item!, _min, Math.Min(Max, max.Max));
+        public UncertainInt ButAtLeast(UncertainInt min) => IsCertain ? this : new(_getValue.Item!, Math.Max(Min, min.Min), _max);
     }
 }

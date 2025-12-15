@@ -13,15 +13,36 @@ namespace KTANERoboExpert;
 /// <param name="Ports">The bomb's port plates.</param>
 /// <param name="Strikes">The number of strikes on the bomb.</param>
 public record Edgework(
-    Uncertain<string> SerialNumber, 
-    UncertainInt Batteries, 
-    UncertainInt BatteryHolders, 
+    Uncertain<string> SerialNumber,
+    UncertainInt Batteries,
+    UncertainInt BatteryHolders,
     Uncertain<IReadOnlyCollection<Indicator>> Indicators,
-    Uncertain<IReadOnlyCollection<PortPlate>> Ports, 
+    Uncertain<IReadOnlyCollection<PortPlate>> Ports,
     int Strikes,
     UncertainInt Solves,
-    UncertainInt ModuleCount)
+    UncertainInt ModuleCount,
+    UncertainInt WidgetCount)
 {
+    public UncertainInt Batteries
+    {
+        get
+        {
+            if (field.IsCertain)
+                return field;
+            return BatteryHolders * UncertainInt.InRange(1, 2, field.Fill);
+        }
+        init;
+    } = Batteries;
+
+    internal UncertainInt _batteryHolders { get => field.ButAtLeast(0).ButAtMost(WidgetCount); init => field = value; } = BatteryHolders;
+    public UncertainInt BatteryHolders => _batteryHolders.Map(c => new UncertainInt(c)).OrElse(WidgetCount - (_indicatorCount + _portPlateCount).ButAtMost(WidgetCount));
+
+    private UncertainInt _indicatorCount => Indicators.Map(c => new UncertainInt(c.Count)).OrElse(UncertainInt.AtLeast(0, Indicators.Fill).ButAtMost(WidgetCount));
+    public UncertainInt IndicatorCount => Indicators.Map(c => new UncertainInt(c.Count)).OrElse(WidgetCount - (_batteryHolders + _portPlateCount).ButAtMost(WidgetCount));
+
+    private UncertainInt _portPlateCount => Ports.Map(c => new UncertainInt(c.Count)).OrElse(UncertainInt.AtLeast(0, Indicators.Fill).ButAtMost(WidgetCount));
+    public UncertainInt PortPlateCount => Ports.Map(c => new UncertainInt(c.Count)).OrElse(WidgetCount - (_batteryHolders + _indicatorCount).ButAtMost(WidgetCount));
+
     /// <summary>
     /// Represents an indicator.
     /// </summary>

@@ -541,7 +541,7 @@ internal static partial class Program
             _edgework = _edgework with
             {
                 Batteries = int.Parse(match.Groups[1].Value),
-                BatteryHolders = int.Parse(match.Groups[2].Value)
+                _batteryHolders = int.Parse(match.Groups[2].Value)
             };
 
             Speak(_edgework.Batteries.Value + " in " + _edgework.BatteryHolders.Value);
@@ -643,8 +643,8 @@ internal static partial class Program
             new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Ports, a, b)),
             0,
             UncertainInt.AtLeast(0, (a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Solves, a, b)),
-            UncertainInt.AtLeast(0, (a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.ModuleCount, a, b))
-            );
+            UncertainInt.AtLeast(0, (a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.ModuleCount, a, b)),
+            5);
     }
 
     [GeneratedRegex("(\\d+) batteries (\\d+) holders", RegexOptions.Compiled)]

@@ -37,7 +37,7 @@ public class ComplicatedWires : RoboExpertModule
             {
                 Command.Cut => true,
                 Command.Skip => false,
-                Command.SerialNumber => Edgework.SerialNumberDigits().Value!.Last() % 2 == 0,
+                Command.SerialNumber => Edgework.SerialNumberDigits().Last() % 2 == 0,
                 Command.Batteries => Edgework.Batteries.Value! >= 2,
                 Command.Parallel => Edgework.Ports.Value!.Any(p => p.Parallel),
                 _ => throw new UnreachableException(),
