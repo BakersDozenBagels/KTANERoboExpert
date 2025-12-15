@@ -153,6 +153,7 @@ public partial class Memory : RoboExpertModule
             _undoHistory.Undo();
             _undoHistory.NewModule();
             ExitSubmenu();
+            Solve();
         }
     }
 

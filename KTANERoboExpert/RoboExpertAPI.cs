@@ -15,4 +15,12 @@ internal static class RoboExpertAPI
 
     internal static event Func<Edgework> OnQueryEdgework = () => Program.UnspecifiedEdgework;
     internal static Edgework QueryEdgework() => OnQueryEdgework();
+
+    internal static event Action<string> OnSolve = s => { };
+    internal static void Solve(string module) => OnSolve(module);
+
+    internal static event Action<Action<string?>> OnRegisterSolveHandler = s => { };
+    internal static void RegisterSolveHandler(Action<string?> handler) => OnRegisterSolveHandler(handler);
+    internal static event Action<Action<string?>> OnUnregisterSolveHandler = s => { };
+    internal static void UnregisterSolveHandler(Action<string?> handler) => OnUnregisterSolveHandler(handler);
 }

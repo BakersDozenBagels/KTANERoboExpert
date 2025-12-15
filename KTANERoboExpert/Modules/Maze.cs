@@ -55,7 +55,7 @@ public class Maze : RoboExpertModule
                 return;
             }
 
-            _data = new(mz, "abcdef".IndexOf(chunks[3].Column), chunks[3].Row - 1);
+            _data = new(mz, "abcdef".IndexOf(chunks[3].Column), chunks[3].Row - 1, false);
 
             parts = [chunks[2].Command, chunks[2].Column.ToString(), chunks[2].Row.ToString()];
         }
@@ -107,7 +107,16 @@ public class Maze : RoboExpertModule
 
     public override void Reset() => _data = null;
 
-    private readonly record struct MazeData(int Maze, int Col, int Row);
+    public override void Cancel()
+    {
+        if (_data is { Solved: false } d)
+        {
+            Solve();
+            _data = d with { Solved = true };
+        }
+    }
+
+    private readonly record struct MazeData(int Maze, int Col, int Row, bool Solved);
 
     /// <summary>
     /// up open = 1

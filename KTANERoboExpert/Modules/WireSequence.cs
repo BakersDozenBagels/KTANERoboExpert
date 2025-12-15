@@ -64,6 +64,7 @@ public class WireSequence : RoboExpertModule
                 {
                     _undo.NewModule();
                     ExitSubmenu();
+                    Solve();
                 }
                 else
                     _undo.Do(newState);

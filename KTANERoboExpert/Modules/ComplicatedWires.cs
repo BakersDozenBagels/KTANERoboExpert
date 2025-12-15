@@ -23,7 +23,7 @@ public class ComplicatedWires : RoboExpertModule
         RunCommands(chunks.Select(c => c.Item).ToArray());
     }
 
-    private static void RunCommands(Command[] commands)
+    private void RunCommands(Command[] commands)
     {
         if (commands.Contains(Command.SerialNumber) && !Edgework.SerialNumber.IsCertain)
             Edgework.SerialNumber.Fill(() => RunCommands(commands));
@@ -43,6 +43,7 @@ public class ComplicatedWires : RoboExpertModule
                 _ => throw new UnreachableException(),
             }).Select(b => b ? "cut" : "skip").Conjoin());
             ExitSubmenu();
+            Solve();
         }
     }
 

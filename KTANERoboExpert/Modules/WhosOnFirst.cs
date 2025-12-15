@@ -20,6 +20,7 @@ public class WhosOnFirst : RoboExpertModule
         {
             _stagesDone = 0;
             ExitSubmenu();
+            Solve();
         }
     }
 

@@ -31,6 +31,7 @@ public partial class Button : RoboExpertModule
             ExitSubmenu();
             ExitSubmenu();
             _holding = false;
+            Solve();
             return;
         }
 
@@ -52,10 +53,11 @@ public partial class Button : RoboExpertModule
             todo.Fill(() => ProcessCommand(command));
     }
 
-    private static void Tap()
+    private void Tap()
     {
         Speak("Tap");
         ExitSubmenu();
+        Solve();
     }
 
     private void Hold()

@@ -46,6 +46,7 @@ public class MorseCode : RoboExpertModule
         {
             Reset();
             ExitSubmenu();
+            Solve();
         }
     }
 

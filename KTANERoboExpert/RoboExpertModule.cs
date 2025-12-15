@@ -50,6 +50,14 @@ public abstract class RoboExpertModule
     /// </remarks>
     protected static void ExitSubmenu() => RoboExpertAPI.ExitSubmenu();
     /// <summary>
+    /// Call this when the current module should be solved.
+    /// </summary>
+    protected void Solve() => RoboExpertAPI.Solve(Name);
+    /// <summary>
+    /// Use this to (de-)register a handler for when any module, including this one, is solved.
+    /// </summary>
+    protected static event Action<string?> OnSolve { add => RoboExpertAPI.RegisterSolveHandler(value); remove => RoboExpertAPI.UnregisterSolveHandler(value); }
+    /// <summary>
     /// Gets the bomb's current edgework.
     /// </summary>
     protected static Edgework Edgework => RoboExpertAPI.QueryEdgework();
@@ -113,6 +121,10 @@ public abstract class RoboExpertModule
         /// <summary>The bomb's indicators.</summary>
         Indicators,
         /// <summary>The bomb's ports and ports plates.</summary>
-        Ports
+        Ports,
+        /// <summary>The number of solved modules.</summary>
+        Solves,
+        /// <summary>The total number of modules.</summary>
+        ModuleCount,
     }
 }

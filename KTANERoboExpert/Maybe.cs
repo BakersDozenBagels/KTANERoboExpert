@@ -49,6 +49,9 @@ public readonly struct Maybe<T> : IEnumerable<T>, IOrderedEnumerable<T>, IEquata
 
     public static implicit operator Maybe<T>(T item) => new(item);
 
+    public Maybe<U> Map<U>(Func<T, U> map) => Exists ? map(Item) : new Maybe<U>();
+    public Maybe<U> FlatMap<U>(Func<T, Maybe<U>> map) => Exists ? map(Item) : new Maybe<U>();
+
     public override bool Equals(object? obj) => obj is Maybe<T> maybe && Equals(maybe);
     public bool Equals(Maybe<T> other) => Exists == other.Exists && EqualityComparer<T?>.Default.Equals(Item, other.Item);
     public static bool operator ==(Maybe<T> left, Maybe<T> right) => left.Equals(right);

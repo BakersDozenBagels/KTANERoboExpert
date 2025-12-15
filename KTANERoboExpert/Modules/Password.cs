@@ -21,6 +21,7 @@ public class Password : RoboExpertModule
         var third = parts.Skip(7).ToArray();
         Speak(_passwords.Where(p => first.Contains(p[0]) && third.Contains(p[2])).Conjoin(", ", ", or "));
         ExitSubmenu();
+        Solve();
     }
 
     private static readonly IReadOnlyCollection<string> _passwords = [

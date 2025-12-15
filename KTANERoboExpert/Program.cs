@@ -78,6 +78,10 @@ internal static partial class Program
             });
         };
 
+        RoboExpertAPI.OnSolve += HandleSolve;
+        RoboExpertAPI.OnRegisterSolveHandler += h => _onSolveHandlers.Add(h);
+        RoboExpertAPI.OnUnregisterSolveHandler += h => _onSolveHandlers.Remove(h);
+
         _modules = AppDomain
             .CurrentDomain
             .GetAssemblies()
@@ -100,7 +104,7 @@ internal static partial class Program
         all.Add("edgework");
         all.Add("reset");
         _defaultGrammar = new Grammar(all.ToGrammarBuilder());
-        _globalGrammar = new Grammar(new GrammarBuilder(new Choices("cancel", "strike")));
+        _globalGrammar = new Grammar(new GrammarBuilder(new Choices("cancel", "strike", "solve")));
 
         var digit = new Choices();
         var letter = new Choices();
@@ -115,7 +119,7 @@ internal static partial class Program
             letter.Add(c);
             character.Add(c);
         }
-        var number = new Choices(Enumerable.Range(0, 100).Select(x => x.ToString()).ToArray());
+        var number = new Choices(Enumerable.Range(0, 102).Select(x => x.ToString()).ToArray());
 
         var serialb = new GrammarBuilder();
         var serialb2 = new GrammarBuilder("serial");
@@ -166,12 +170,26 @@ internal static partial class Program
         var portsMenu = "ports" + ports.ToGrammarBuilder();
         _edgeworkGrammars.Add(portsGrammar);
 
+        var modulesb = new GrammarBuilder();
+        modulesb.Append(number);
+        modulesb.Append("modules");
+        var modules = new Grammar(modulesb);
+        _edgeworkGrammars.Add(modules);
+
+        var solvesb = new GrammarBuilder();
+        solvesb.Append(number);
+        solvesb.Append("solves");
+        var solves = new Grammar(solvesb);
+        _edgeworkGrammars.Add(solves);
+
         var edgeworkPieces = new Choices();
         edgeworkPieces.Add(serialb2);
         edgeworkPieces.Add(batteriesb);
         edgeworkPieces.Add(strike);
         edgeworkPieces.Add(indicatorsc);
         edgeworkPieces.Add(portsMenu);
+        edgeworkPieces.Add(modulesb);
+        edgeworkPieces.Add(solvesb);
 
         _edgeworkGrammar = new Grammar(edgeworkPieces.ToGrammarBuilder());
         _edgeworkGrammars.Add(_edgeworkGrammar);
@@ -184,6 +202,8 @@ internal static partial class Program
                 RoboExpertModule.EdgeworkType.Batteries => _edgework.Batteries,
                 RoboExpertModule.EdgeworkType.Indicators => _edgework.Indicators,
                 RoboExpertModule.EdgeworkType.Ports => _edgework.Ports,
+                RoboExpertModule.EdgeworkType.Solves => _edgework.Solves,
+                RoboExpertModule.EdgeworkType.ModuleCount => _edgework.ModuleCount,
                 _ => throw new ArgumentException("Bad edgework type", nameof(type)),
             }).IsCertain)
             {
@@ -204,6 +224,8 @@ internal static partial class Program
                     RoboExpertModule.EdgeworkType.Batteries => batteries,
                     RoboExpertModule.EdgeworkType.Indicators => indicators,
                     RoboExpertModule.EdgeworkType.Ports => portsGrammar,
+                    RoboExpertModule.EdgeworkType.Solves => modules,
+                    RoboExpertModule.EdgeworkType.ModuleCount => solves,
                     _ => throw new ArgumentException("Bad edgework type", nameof(type)),
                 };
                 _edgeworkQuery = type;
@@ -213,6 +235,8 @@ internal static partial class Program
                     RoboExpertModule.EdgeworkType.Batteries => "What are the batteries?",
                     RoboExpertModule.EdgeworkType.Indicators => "What are the indicators?",
                     RoboExpertModule.EdgeworkType.Ports => "What are the ports?",
+                    RoboExpertModule.EdgeworkType.Solves => "How many solves?",
+                    RoboExpertModule.EdgeworkType.ModuleCount => "How many modules?",
                     _ => throw new ArgumentException("Bad edgework type", nameof(type)),
                 });
                 if (!_microphone.Grammars.Contains(g))
@@ -345,6 +369,16 @@ internal static partial class Program
         return true;
     }
 
+    private readonly static List<Action<string?>> _onSolveHandlers = [];
+    private static void HandleSolve(string? module)
+    {
+        _edgework = _edgework with { Solves = _edgework.Solves + 1 };
+        if (_onSolveHandlers.Count is not 0)
+            Speak("Solve " + (_edgework.Solves.IsCertain ? _edgework.Solves.Value : _edgework.Solves.Min));
+        foreach (var h in _onSolveHandlers)
+            h(module);
+    }
+
     private static void Recognized(object? sender, SpeechRecognizedEventArgs e)
     {
         if (!_listening) return;
@@ -374,6 +408,8 @@ internal static partial class Program
                 _edgework = _edgework with { Strikes = _edgework.Strikes + 1 };
                 Speak("strike " + _edgework.Strikes);
             }
+            else if (e.Result.Text == "solve")
+                HandleSolve(null);
         }
         else if (_edgeworkGrammars.Contains(e.Result.Grammar))
         {
@@ -493,7 +529,7 @@ internal static partial class Program
                 BatteryHolders = int.Parse(match.Groups[2].Value)
             };
 
-            Speak(_edgework.Batteries + " in " + _edgework.BatteryHolders);
+            Speak(_edgework.Batteries.Value + " in " + _edgework.BatteryHolders.Value);
         }
         else if (_edgeworkQuery == RoboExpertModule.EdgeworkType.Indicators || (_edgeworkQuery == null && (IndicatorsRegex().IsMatch(command) || NoIndicatorsRegex().IsMatch(command))))
         {
@@ -544,6 +580,16 @@ internal static partial class Program
                 Speak(plates.Length + " port plate" + (plates.Length > 1 ? "s" : ""));
             }
         }
+        else if (_edgeworkQuery == RoboExpertModule.EdgeworkType.ModuleCount || (_edgeworkQuery == null && command.EndsWith(" modules")))
+        {
+            _edgework = _edgework with { ModuleCount = int.Parse(command[..^8]) };
+            Speak(command[..^8] + " modules");
+        }
+        else if (_edgeworkQuery == RoboExpertModule.EdgeworkType.Solves || (_edgeworkQuery == null && command.EndsWith(" solves")))
+        {
+            _edgework = _edgework with { Solves = int.Parse(command[..^7]) };
+            Speak(command[..^7] + " solves");
+        }
         else if (_edgeworkQuery == null && command.StartsWith("strike"))
         {
             _edgework = _edgework with { Strikes = int.Parse(command[7..]) };
@@ -580,7 +626,10 @@ internal static partial class Program
             new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Batteries, a, b)),
             new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Indicators, a, b)),
             new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Ports, a, b)),
-            0);
+            0,
+            UncertainInt.AtLeast(0, (a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Solves, a, b)),
+            UncertainInt.AtLeast(0, (a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.ModuleCount, a, b))
+            );
     }
 
     [GeneratedRegex("(\\d+) batteries (\\d+) holders", RegexOptions.Compiled)]

@@ -58,6 +58,7 @@ public partial class Wires : RoboExpertModule
         {
             Speak("Cut " + ord[result.Value]);
             ExitSubmenu();
+            Solve();
         }
         else
         {

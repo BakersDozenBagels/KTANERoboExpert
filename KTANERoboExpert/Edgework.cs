@@ -12,7 +12,15 @@ namespace KTANERoboExpert;
 /// <param name="Indicators">The bomb's indicators.</param>
 /// <param name="Ports">The bomb's port plates.</param>
 /// <param name="Strikes">The number of strikes on the bomb.</param>
-public record Edgework(Uncertain<string> SerialNumber, UncertainInt Batteries, UncertainInt BatteryHolders, Uncertain<IReadOnlyCollection<Indicator>> Indicators, Uncertain<IReadOnlyCollection<PortPlate>> Ports, int Strikes)
+public record Edgework(
+    Uncertain<string> SerialNumber, 
+    UncertainInt Batteries, 
+    UncertainInt BatteryHolders, 
+    Uncertain<IReadOnlyCollection<Indicator>> Indicators,
+    Uncertain<IReadOnlyCollection<PortPlate>> Ports, 
+    int Strikes,
+    UncertainInt Solves,
+    UncertainInt ModuleCount)
 {
     /// <summary>
     /// Represents an indicator.

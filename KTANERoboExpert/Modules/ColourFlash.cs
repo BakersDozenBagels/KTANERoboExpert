@@ -16,6 +16,7 @@ public partial class ColourFlash : RoboExpertModule
         var answer = Solve(parts);
         Speak($"Press {(answer.Yes ? "Yes" : "No")} on {answer.Item1.Index + 1}, {answer.Item1.Word} in {answer.Item1.Color}");
         ExitSubmenu();
+        Solve();
     }
 
     private ((int Index, string Word, string Color), bool Yes) Solve((string Word, string Color)[] parts)

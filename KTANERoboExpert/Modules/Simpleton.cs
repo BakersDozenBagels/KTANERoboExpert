@@ -16,5 +16,6 @@ public class Simpleton : RoboExpertModule
     {
         Speak("Push the button.");
         ExitSubmenu();
+        Solve();
     }
 }

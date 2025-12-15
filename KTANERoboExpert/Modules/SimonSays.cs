@@ -48,4 +48,6 @@ public class SimonSays : RoboExpertModule
         base.Select();
         Edgework.SerialNumber.Fill(() => { });
     }
+
+    public override void Cancel() => Solve();
 }
