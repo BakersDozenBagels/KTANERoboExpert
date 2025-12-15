@@ -1,4 +1,5 @@
-﻿using System.Speech.Recognition;
+﻿using KTANERoboExpert.Uncertain;
+using System.Speech.Recognition;
 using System.Text.RegularExpressions;
 
 namespace KTANERoboExpert.Modules;
@@ -37,35 +38,18 @@ public partial class Button : RoboExpertModule
         var color = btn.Groups[1].Value;
         var label = btn.Groups[2].Value;
 
-        if (color == "blue" && label == "abort")
-            Hold();
-        else if (label == "detonate" && Edgework.Batteries == null)
-            Fill(EdgeworkType.Batteries, command);
-        else if (label == "detonate" && Edgework.Batteries > 1)
-            Tap();
-        else if (color == "white" && Edgework.Indicators == null)
-            Fill(EdgeworkType.Indicators, command);
-        else if (color == "white" && Edgework.Indicators!.Any(i => i.Lit && i.Label == "CAR"))
-            Hold();
-        else if (Edgework.Batteries == null && Edgework.Indicators == null)
-            Fill(EdgeworkType.Batteries, command);
-        else if (Edgework.Indicators == null && Edgework.Batteries > 2)
-            Fill(EdgeworkType.Indicators, command);
-        else if (Edgework.Batteries == null && Edgework.Indicators!.Any(i => i.Lit && i.Label == "CAR"))
-            Fill(EdgeworkType.Batteries, command);
-        else if (Edgework.Batteries > 2 && Edgework.Indicators!.Any(i => i.Lit && i.Label == "CAR"))
-            Tap();
-        else if (color == "yellow")
-            Hold();
-        else if (color == "red" && label == "hold")
-            Tap();
-        else
-            Hold();
-    }
+        var todo = new UncertainCondition<Action>(color == "blue" && label == "abort", Hold)
+            | (label == "detonate" & Edgework.Batteries > 1, Tap)
+            | (color == "white" & Edgework.HasIndicator("CAR", lit: true), Hold)
+            | (Edgework.Batteries > 2 & Edgework.HasIndicator("FRK", lit: true), Tap)
+            | (color == "yellow", Hold)
+            | (color == "red" && label == "hold", Tap)
+            | Hold;
 
-    private void Fill(EdgeworkType type, string command)
-    {
-        RequestEdgeworkFill(type, () => ProcessCommand(command));
+        if (todo.IsCertain)
+            todo.Value();
+        else
+            todo.Fill(() => ProcessCommand(command));
     }
 
     private static void Tap()

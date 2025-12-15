@@ -1,9 +1,11 @@
-﻿using KTANERoboExpert;
+﻿#if DEBUG
 using System.Diagnostics;
-using System.Linq;
+#endif
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
 using System.Text.RegularExpressions;
+using KTANERoboExpert;
+using KTANERoboExpert.Uncertain;
 
 internal static partial class Program
 {
@@ -14,10 +16,11 @@ internal static partial class Program
     private static bool _listening, _resetConfirm, _subtitlesOn;
     private static readonly Stack<Context> _contexts = [];
     private static RoboExpertModule[] _modules;
-    private static Edgework _edgework = Edgework.Unspecified;
+    private static Edgework _edgework = UnspecifiedEdgework;
     private static Action _edgeworkCallback = () => { };
     private static Action? _edgeworkCancel;
     private static RoboExpertModule.EdgeworkType? _edgeworkQuery;
+    private static Action<RoboExpertModule.EdgeworkType, Action, Action?> _onRequestEdgeworkFill;
 
 #if DEBUG
     private static bool _micOn;
@@ -173,18 +176,19 @@ internal static partial class Program
         _edgeworkGrammar = new Grammar(edgeworkPieces.ToGrammarBuilder());
         _edgeworkGrammars.Add(_edgeworkGrammar);
 
-        RoboExpertAPI.OnRequestEdgeworkFill += (type, callback, onCancel) =>
+        _onRequestEdgeworkFill = (type, callback, onCancel) =>
         {
-            if (type switch
+            if ((type switch
             {
-                RoboExpertModule.EdgeworkType.SerialNumber => _edgework.SerialNumber as object,
+                RoboExpertModule.EdgeworkType.SerialNumber => _edgework.SerialNumber as IUncertain,
                 RoboExpertModule.EdgeworkType.Batteries => _edgework.Batteries,
                 RoboExpertModule.EdgeworkType.Indicators => _edgework.Indicators,
                 RoboExpertModule.EdgeworkType.Ports => _edgework.Ports,
                 _ => throw new ArgumentException("Bad edgework type", nameof(type)),
-            } is not null)
+            }).IsCertain)
             {
-                callback();
+                if (callback is not null)
+                    callback();
                 return;
             }
 
@@ -417,7 +421,7 @@ internal static partial class Program
                 }
                 else
                 {
-                    _edgework = Edgework.Unspecified;
+                    _edgework = UnspecifiedEdgework;
                     foreach (var m in _modules)
                         m.Reset();
                     Speak("Bomb has been reset");
@@ -478,7 +482,7 @@ internal static partial class Program
                 .Conjoin(string.Empty)
             };
 
-            Speak(_edgework.SerialNumber.Select(c => c.ToString()).Conjoin());
+            Speak(_edgework.SerialNumber.Value!.Select(c => c.ToString()).Conjoin());
         }
         else if (_edgeworkQuery == RoboExpertModule.EdgeworkType.Batteries || (_edgeworkQuery == null && BatteryRegex().IsMatch(command)))
         {
@@ -494,9 +498,7 @@ internal static partial class Program
         else if (_edgeworkQuery == RoboExpertModule.EdgeworkType.Indicators || (_edgeworkQuery == null && (IndicatorsRegex().IsMatch(command) || NoIndicatorsRegex().IsMatch(command))))
         {
             if (NoIndicatorsRegex().IsMatch(command))
-            {
-                _edgework = _edgework with { Indicators = [] };
-            }
+                _edgework = _edgework with { Indicators = new([]) };
             else
             {
                 _edgework = _edgework with
@@ -508,7 +510,7 @@ internal static partial class Program
                 };
             }
 
-            Speak(_edgework.Indicators.Count + " indicator" + (_edgework.Indicators.Count == 1 ? "" : "s"));
+            Speak(_edgework.Indicators.Value!.Count + " indicator" + (_edgework.Indicators.Value!.Count == 1 ? "" : "s"));
         }
         else if (_edgeworkQuery == RoboExpertModule.EdgeworkType.Ports || (_edgeworkQuery == null && command.StartsWith("ports ")))
         {
@@ -516,7 +518,7 @@ internal static partial class Program
                 command = command[6..];
             if (command == "none")
             {
-                _edgework = _edgework with { Ports = [] };
+                _edgework = _edgework with { Ports = new([]) };
                 Speak("0 port plates");
             }
             else
@@ -538,7 +540,7 @@ internal static partial class Program
                     .ToArray();
                 if (plates.Any(p => !p.Exists))
                     return;
-                _edgework = _edgework with { Ports = [.. plates.Select(x => x.Item)] };
+                _edgework = _edgework with { Ports = new([.. plates.Select(x => x.Item)]) };
                 Speak(plates.Length + " port plate" + (plates.Length > 1 ? "s" : ""));
             }
         }
@@ -568,6 +570,17 @@ internal static partial class Program
     {
         while (_toLoad.Count > 0)
             _toLoad.Dequeue()();
+    }
+
+    internal static Edgework UnspecifiedEdgework
+    {
+        get => new(
+            new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.SerialNumber, a, b)),
+            new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Batteries, a, b)),
+            new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Batteries, a, b)),
+            new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Indicators, a, b)),
+            new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Ports, a, b)),
+            0);
     }
 
     [GeneratedRegex("(\\d+) batteries (\\d+) holders", RegexOptions.Compiled)]

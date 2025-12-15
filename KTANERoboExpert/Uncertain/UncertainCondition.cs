@@ -1,4 +1,6 @@
-﻿namespace KTANERoboExpert.Uncertain
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace KTANERoboExpert.Uncertain
 {
     /// <summary>
     /// Represents a chain of elseif conditions.
@@ -11,6 +13,7 @@
         /// </summary>
         public bool Exhaustive { get; private init; }
         /// <inheritdoc/>
+        [MemberNotNullWhen(true, nameof(Value))]
         public bool IsCertain { get => Exhaustive && Reduce().Count() is 1; }
         /// <summary>
         /// Evert possible outcome of this condition chain.
@@ -31,15 +34,11 @@
         }
 
         /// <inheritdoc/>
-        public void Fill() => _values[1].Item1.Fill();
+        public void Fill(Action onFill, Action? onCancel = null) => _values[1].Item1.Fill(onFill, onCancel);
 
         /// <summary>
         /// A condition and the result of it being true.
         /// </summary>
-        /// <remarks>
-        /// For an "otherwise" condition, use
-        /// <code>new UncertainCondition(new(true), value)</code>
-        /// </remarks>
         public UncertainCondition(UncertainBool key, T value)
         {
             if (key.IsCertain && !key.Value)
@@ -72,11 +71,24 @@
             if (Exhaustive)
                 return this;
 
-            return new([.._values, ..other._values], other.Exhaustive);
+            return new([.. _values, .. other._values], other.Exhaustive);
+        }
+
+        /// <summary>
+        /// Adds an "otherwise" condition to the end of this chain.
+        /// </summary>
+        public UncertainCondition<T> OrElse(T other)
+        {
+            if (Exhaustive)
+                return this;
+
+            return new([.. _values, (true, other)], true);
         }
 
         /// <inheritdoc cref="UncertainCondition{T}.OrElse(UncertainCondition{T})"/>
         public static UncertainCondition<T> operator |(UncertainCondition<T> a, UncertainCondition<T> b) => a.OrElse(b);
+        /// <inheritdoc cref="UncertainCondition{T}.OrElse(T)"/>
+        public static UncertainCondition<T> operator |(UncertainCondition<T> a, T b) => a.OrElse(b);
         /// <inheritdoc cref="UncertainCondition{T}.UncertainCondition(UncertainBool, T)"/>
         public static implicit operator UncertainCondition<T>((UncertainBool key, T value) tup) => new(tup.key, tup.value);
     }

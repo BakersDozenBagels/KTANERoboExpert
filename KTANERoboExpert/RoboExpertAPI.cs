@@ -13,9 +13,6 @@ internal static class RoboExpertAPI
     internal static event Action OnExitSubmenu = () => { };
     internal static void ExitSubmenu() => OnExitSubmenu();
 
-    internal static event Func<Edgework> OnQueryEdgework = () => Edgework.Unspecified;
+    internal static event Func<Edgework> OnQueryEdgework = () => Program.UnspecifiedEdgework;
     internal static Edgework QueryEdgework() => OnQueryEdgework();
-
-    internal static event Action<RoboExpertModule.EdgeworkType, Action, Action> OnRequestEdgeworkFill = (_, _, _) => { };
-    internal static void RequestEdgeworkFill(RoboExpertModule.EdgeworkType type, Action callback, Action onCancel) => OnRequestEdgeworkFill(type, callback, onCancel);
 }

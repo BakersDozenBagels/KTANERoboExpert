@@ -1,4 +1,5 @@
-﻿using static KTANERoboExpert.Edgework;
+﻿using KTANERoboExpert.Uncertain;
+using static KTANERoboExpert.Edgework;
 
 namespace KTANERoboExpert;
 
@@ -11,10 +12,8 @@ namespace KTANERoboExpert;
 /// <param name="Indicators">The bomb's indicators.</param>
 /// <param name="Ports">The bomb's port plates.</param>
 /// <param name="Strikes">The number of strikes on the bomb.</param>
-public record Edgework(string? SerialNumber, int? Batteries, int? BatteryHolders, IReadOnlyCollection<Indicator>? Indicators, IReadOnlyCollection<PortPlate>? Ports, int Strikes)
+public record Edgework(Uncertain<string> SerialNumber, UncertainInt Batteries, UncertainInt BatteryHolders, Uncertain<IReadOnlyCollection<Indicator>> Indicators, Uncertain<IReadOnlyCollection<PortPlate>> Ports, int Strikes)
 {
-    internal static Edgework Unspecified => new(null, null, null, null, null, 0);
-
     /// <summary>
     /// Represents an indicator.
     /// </summary>

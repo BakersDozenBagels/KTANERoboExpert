@@ -12,15 +12,15 @@ public class SimonSays : RoboExpertModule
 
     public override void ProcessCommand(string command)
     {
-        if (Edgework.SerialNumber is null)
+        if (!Edgework.SerialNumber.IsCertain)
         {
-            RequestEdgeworkFill(EdgeworkType.SerialNumber, () => ProcessCommand(command));
+            Edgework.SerialNumber.Fill(() => ProcessCommand(command));
             return;
         }
 
         string[] names = ["red", "blue", "green", "yellow"];
         int[] table =
-            (Edgework.HasSerialNumberVowel(), Edgework.Strikes) switch
+            (Edgework.HasSerialNumberVowel().Value, Edgework.Strikes) switch
             {
                 (true, 0) => [1, 0, 3, 2],
                 (true, 1) => [3, 2, 1, 0],
@@ -46,6 +46,6 @@ public class SimonSays : RoboExpertModule
     public override void Select()
     {
         base.Select();
-        RequestEdgeworkFill(EdgeworkType.SerialNumber);
+        Edgework.SerialNumber.Fill(() => { });
     }
 }

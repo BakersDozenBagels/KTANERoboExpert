@@ -25,21 +25,21 @@ public class ComplicatedWires : RoboExpertModule
 
     private static void RunCommands(Command[] commands)
     {
-        if (commands.Contains(Command.SerialNumber) && Edgework.SerialNumber is null)
-            RequestEdgeworkFill(EdgeworkType.SerialNumber, () => RunCommands(commands));
-        else if (commands.Contains(Command.Batteries) && Edgework.Batteries is null)
-            RequestEdgeworkFill(EdgeworkType.Batteries, () => RunCommands(commands));
-        else if (commands.Contains(Command.Parallel) && Edgework.Ports is null)
-            RequestEdgeworkFill(EdgeworkType.Ports, () => RunCommands(commands));
+        if (commands.Contains(Command.SerialNumber) && !Edgework.SerialNumber.IsCertain)
+            Edgework.SerialNumber.Fill(() => RunCommands(commands));
+        else if (commands.Contains(Command.Batteries) && !Edgework.Batteries.IsCertain)
+            Edgework.Batteries.Fill(() => RunCommands(commands));
+        else if (commands.Contains(Command.Parallel) && !Edgework.Ports.IsCertain)
+            Edgework.Ports.Fill(() => RunCommands(commands));
         else
         {
             Speak(commands.Select(c => c switch
             {
                 Command.Cut => true,
                 Command.Skip => false,
-                Command.SerialNumber => Edgework.SerialNumberDigits().Last() % 2 == 0,
-                Command.Batteries => Edgework.Batteries >= 2,
-                Command.Parallel => Edgework.Ports!.Any(p => p.Parallel),
+                Command.SerialNumber => Edgework.SerialNumberDigits().Value!.Last() % 2 == 0,
+                Command.Batteries => Edgework.Batteries.Value! >= 2,
+                Command.Parallel => Edgework.Ports.Value!.Any(p => p.Parallel),
                 _ => throw new UnreachableException(),
             }).Select(b => b ? "cut" : "skip").Conjoin());
             ExitSubmenu();

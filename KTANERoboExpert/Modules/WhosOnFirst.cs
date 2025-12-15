@@ -95,11 +95,13 @@ public class WhosOnFirst : RoboExpertModule
         ["THEY ARE WORDS"] = "THEY ARE",
         ["T H E Y A R E"] = "THEY ARE",
         ["S E E"] = "SEE",
+        ["SIERRA E E"] = "SEE",
         ["LOOK SEE"] = "SEE",
         ["SEE LOOK"] = "SEE",
         ["C LETTER"] = "C",
         ["LETTER C"] = "C",
         ["C E E"] = "CEE",
+        ["CHARLIE E E"] = "CEE",
     };
     private static readonly Dictionary<string, string> _buttonPhrases = new()
     {

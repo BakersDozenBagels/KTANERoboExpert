@@ -47,6 +47,8 @@ public readonly struct Maybe<T> : IEnumerable<T>, IOrderedEnumerable<T>, IEquata
         bool descending
     ) => this;
 
+    public static implicit operator Maybe<T>(T item) => new(item);
+
     public override bool Equals(object? obj) => obj is Maybe<T> maybe && Equals(maybe);
     public bool Equals(Maybe<T> other) => Exists == other.Exists && EqualityComparer<T?>.Default.Equals(Item, other.Item);
     public static bool operator ==(Maybe<T> left, Maybe<T> right) => left.Equals(right);

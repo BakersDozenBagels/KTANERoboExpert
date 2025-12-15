@@ -1,4 +1,4 @@
-﻿using System.Speech.Recognition;
+﻿using KTANERoboExpert.Uncertain;
 using System.Text;
 
 namespace KTANERoboExpert;
@@ -47,18 +47,27 @@ internal static class Extensions
     }
 
     /// <summary>
+    /// Maps this value to value to an <see cref="UncertainBool"/> if it is certain, or propogates uncertainty otherwise.
+    /// </summary>
+    public static UncertainBool Matches<T>(this IUncertain<T> u, Func<T, UncertainBool> predicate) =>
+        u.IsCertain ? predicate(u.Value!) : new(u.Fill);
+
+    /// <summary>
     /// Tests whether the serial number has a vowel. This does not include Y.
     /// </summary>
-    /// <exception cref="NullReferenceException">Thrown when the serial number is unknown.</exception>
-    /// <param name="edgework">The edgework to test</param>
-    /// <returns><see langword="true"/> if the serial number has a vowel, <see cref="false"/> otherwise.</returns>
-    public static bool HasSerialNumberVowel(this Edgework edgework) => edgework.SerialNumber!.Any("AEIOU".Contains);
+    public static UncertainBool HasSerialNumberVowel(this Edgework edgework) => edgework.SerialNumber.Matches(s => s.Any("AEIOU".Contains));
     /// <summary>
     /// Gets the numeric digits in the serial number.
     /// </summary>
-    /// <exception cref="NullReferenceException">Thrown when the serial number is unknown.</exception>
-    /// <param name="edgework">The edgework to test</param>
-    /// <returns>The numeric digits in the serial number</returns>
-    public static IEnumerable<int> SerialNumberDigits(this Edgework edgework) =>
-        edgework.SerialNumber!.Where("0123456789".Contains).Select(c => int.Parse(c.ToString()));
+    public static Uncertain<IEnumerable<int>> SerialNumberDigits(this Edgework edgework) =>
+        edgework.SerialNumber.IsCertain ? new(edgework.SerialNumber.Value.Where("0123456789".Contains).Select(c => int.Parse(c.ToString()))) : new(edgework.SerialNumber.Fill);
+    /// <summary>
+    /// Tests whether the bomb has an indicator with the given properties.
+    /// </summary>
+    /// <param name="label">Optionally, the label to check for.</param>
+    /// <param name="lit">Optionally, whether the indicator should be lit or unlit.</param>
+    public static UncertainBool HasIndicator(this Edgework edgework, Maybe<string> label = default, Maybe<bool> lit = default) =>
+        edgework.Indicators.IsCertain
+            ? new(edgework.Indicators.Value.Any(i => (!label.Exists || i.Label == label.Item) && (!lit.Exists || i.Lit == lit.Item)))
+            : new(edgework.Indicators.Fill);
 }

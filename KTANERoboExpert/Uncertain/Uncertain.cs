@@ -6,7 +6,7 @@ namespace KTANERoboExpert.Uncertain
     public class Uncertain<T> : IUncertain<T>
     {
         private readonly Maybe<T> _value;
-        protected readonly Maybe<Action> _getValue;
+        protected readonly Maybe<Action<Action, Action?>> _getValue;
 
         /// <summary>
         /// A definitely known value.
@@ -19,7 +19,7 @@ namespace KTANERoboExpert.Uncertain
         /// <summary>
         /// A definitely unknown value.
         /// </summary>
-        public Uncertain(Action getValue)
+        public Uncertain(Action<Action, Action?> getValue)
         {
             _value = new();
             _getValue = new(getValue);
@@ -32,17 +32,17 @@ namespace KTANERoboExpert.Uncertain
         /// <inheritdoc/>
         public T? Value => _value.Item;
         /// <inheritdoc/>
-        public void Fill()
+        public void Fill(Action onFill, Action? onCancel = null)
         {
             if (!_getValue.Exists)
                 return;
-            _getValue.Item();
+            _getValue.Item(onFill, onCancel);
         }
 
         /// <inheritdoc cref="Uncertain{T}.Uncertain(T)"/>
         public static implicit operator Uncertain<T>(T value) => new(value);
         /// <inheritdoc cref="Uncertain{T}.Uncertain(Action)"/>
-        public static explicit operator Uncertain<T>(Action getValue) => new(getValue);
+        public static explicit operator Uncertain<T>(Action<Action, Action?> getValue) => new(getValue);
         /// <inheritdoc cref="Uncertain{T}.Value"/>
         public static explicit operator T(Uncertain<T> u) => u.Value!;
     }

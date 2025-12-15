@@ -1,4 +1,5 @@
-﻿using System.Speech.Recognition;
+﻿using KTANERoboExpert.Uncertain;
+using System.Speech.Recognition;
 using System.Text.RegularExpressions;
 
 namespace KTANERoboExpert.Modules;
@@ -21,77 +22,48 @@ public partial class Wires : RoboExpertModule
             SpeakSSML("<prosody rate=\"+40%\">" + colors.Select(c => c == "black" ? "k" : c[0].ToString()).Conjoin() + "</prosody>");
         _checkingEdgework = false;
 
+        UncertainCondition<int> result;
         switch (colors.Length)
         {
             case 3:
-                if (!colors.Contains("red"))
-                    Speak("Cut second");
-                else if (colors[2] == "white")
-                    Speak("Cut third");
-                else if (colors.Count(s => s == "blue") > 1)
-                    Speak("Cut " + ord[Array.LastIndexOf(colors, "blue")]);
-                else
-                    Speak("Cut third");
-                ExitSubmenu();
+                result = new UncertainCondition<int>(!colors.Contains("red"), 1) 
+                    | (colors[2] == "white", 2)
+                    | (colors.Count(s => s == "blue") > 1, Array.LastIndexOf(colors, "blue"))
+                    | 2;
                 break;
             case 4:
-                if (colors.Count(s => s == "red") > 1 && Edgework.SerialNumber == null)
-                {
-                    CheckSN(command);
-                    break;
-                }
-                if (colors.Count(s => s == "red") > 1 && (Edgework.SerialNumber![5] - '0') % 2 == 1)
-                    Speak("Cut " + ord[Array.LastIndexOf(colors, "red")]);
-                else if ((colors[3] == "yellow" && !colors.Contains("red")) || colors.Count(s => s == "blue") == 1)
-                    Speak("Cut first");
-                else if (colors.Count(s => s == "yellow") > 1)
-                    Speak("Cut fourth");
-                else
-                    Speak("Cut second");
-                ExitSubmenu();
+                result = new UncertainCondition<int>(colors.Count(s => s == "red") > 1 & Edgework.SerialNumber.Matches(n => (n[5] - '0') % 2 == 1), Array.LastIndexOf(colors, "red"))
+                    | ((colors[3] == "yellow" && !colors.Contains("red")) || colors.Count(s => s == "blue") == 1, 0)
+                    | (colors.Count(s => s == "yellow") > 1, 3)
+                    | 1;
                 break;
             case 5:
-                if (colors[4] == "black" && Edgework.SerialNumber == null)
-                {
-                    CheckSN(command);
-                    break;
-                }
-                if (colors[4] == "black" && (Edgework.SerialNumber![5] - '0') % 2 == 1)
-                    Speak("Cut fourth");
-                else if (colors.Count(s => s == "red") == 1 && colors.Count(s => s == "yellow") > 1)
-                    Speak("Cut first");
-                else if (!colors.Contains("black"))
-                    Speak("Cut second");
-                else
-                    Speak("Cut first");
-                ExitSubmenu();
+                result = new UncertainCondition<int>(colors[4] == "black" & Edgework.SerialNumber.Matches(n => (n[5] - '0') % 2 == 1), 3)
+                    | (colors.Count(s => s == "red") == 1 && colors.Count(s => s == "yellow") > 1, 0)
+                    | (!colors.Contains("black"), 1)
+                    | 0;
                 break;
             case 6:
-                if (!colors.Contains("yellow") && Edgework.SerialNumber == null)
-                {
-                    CheckSN(command);
-                    break;
-                }
-                if (!colors.Contains("yellow") && (Edgework.SerialNumber![5] - '0') % 2 == 1)
-                    Speak("Cut third");
-                else if (colors.Count(s => s == "yellow") == 1 && colors.Count(s => s == "white") > 1)
-                    Speak("Cut fourth");
-                else if (!colors.Contains("red"))
-                    Speak("Cut sixth");
-                else
-                    Speak("Cut fourth");
-                ExitSubmenu();
+                result = new UncertainCondition<int>(!colors.Contains("yellow") & Edgework.SerialNumber.Matches(n => (n[5] - '0') % 2 == 1), 2)
+                    | (colors.Count(s => s == "yellow") == 1 && colors.Count(s => s == "white") > 1, 3)
+                    | (!colors.Contains("red"), 5)
+                    | 3;
                 break;
             default:
                 SpeakSync("Pardon?");
-                break;
+                return;
         }
-    }
 
-    private void CheckSN(string command)
-    {
-        RequestEdgeworkFill(EdgeworkType.SerialNumber, () => ProcessCommand(command), () => _checkingEdgework = false);
-        _checkingEdgework = true;
+        if (result.IsCertain)
+        {
+            Speak("Cut " + ord[result.Value]);
+            ExitSubmenu();
+        }
+        else
+        {
+            _checkingEdgework = true;
+            result.Fill(() => ProcessCommand(command), () => _checkingEdgework = false);
+        }
     }
 
     public override void Reset() => _checkingEdgework = false;

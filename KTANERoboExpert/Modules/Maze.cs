@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Speech.Recognition;
 
 namespace KTANERoboExpert.Modules;

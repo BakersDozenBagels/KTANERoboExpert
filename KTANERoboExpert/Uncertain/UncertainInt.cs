@@ -19,8 +19,8 @@
         /// <summary>
         /// A definitely unknown integer.
         /// </summary>
-        public UncertainInt(Action getValue) : base(getValue) { }
-        private UncertainInt(Action getValue, Maybe<int> min, Maybe<int> max) : base(getValue)
+        public UncertainInt(Action<Action, Action?> getValue) : base(getValue) { }
+        private UncertainInt(Action<Action, Action?> getValue, Maybe<int> min, Maybe<int> max) : base(getValue)
         {
             _min = min;
             _max = max;
@@ -31,15 +31,15 @@
         /// <summary>
         /// An unknown integer constrained to be at least some minimum value.
         /// </summary>
-        public static UncertainInt AtLeast(int min, Action getValue) => new(getValue, new(min), new());
+        public static UncertainInt AtLeast(int min, Action<Action, Action?> getValue) => new(getValue, new(min), new());
         /// <summary>
         /// An unknown integer constrained to be at most some maximum value.
         /// </summary>
-        public static UncertainInt AtMost(int max, Action getValue) => new(getValue, new(), new(max));
+        public static UncertainInt AtMost(int max, Action<Action, Action?> getValue) => new(getValue, new(), new(max));
         /// <summary>
         /// An unknown integer constrained to be within some range.
         /// </summary>
-        public static UncertainInt InRange(int min, int max, Action getValue)
+        public static UncertainInt InRange(int min, int max, Action<Action, Action?> getValue)
         {
             if (min == max)
                 return new(min);
@@ -54,16 +54,16 @@
             int y = b._max.Exists ? b._max.Item : int.MaxValue;
             if (x > y)
                 return true;
-            x = a._max.Exists ? a._max.Item : int.MinValue;
-            y = b._min.Exists ? b._min.Item : int.MaxValue;
+            x = a._max.Exists ? a._max.Item : int.MaxValue;
+            y = b._min.Exists ? b._min.Item : int.MinValue;
             if (x <= y)
                 return false;
             return new(a.IsCertain ? b._getValue.Item! : a._getValue.Item!);
         }
         public static UncertainBool operator <(UncertainInt a, UncertainInt b)
         {
-            int x = a._max.Exists ? a._max.Item : int.MinValue;
-            int y = b._min.Exists ? b._min.Item : int.MaxValue;
+            int x = a._max.Exists ? a._max.Item : int.MaxValue;
+            int y = b._min.Exists ? b._min.Item : int.MinValue;
             if (x < y)
                 return true;
             x = a._min.Exists ? a._min.Item : int.MinValue;

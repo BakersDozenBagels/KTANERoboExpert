@@ -12,7 +12,7 @@
         /// <summary>
         /// A definitely unknown condition.
         /// </summary>
-        public UncertainBool(Action getValue) : base(getValue) { }
+        public UncertainBool(Action<Action, Action?> getValue) : base(getValue) { }
 
         /// <summary>
         /// Combines two conditions with a logical AND while correctly handling uncertainty.
@@ -52,6 +52,10 @@
 
             return new(a.IsCertain ? b._getValue.Item! : a._getValue.Item!);
         }
+        public static UncertainBool operator &(bool a, UncertainBool b) => a ? b : false;
+        public static UncertainBool operator |(bool a, UncertainBool b) => a ? true : b;
+        public static UncertainBool operator &(UncertainBool a, bool b) => b & a;
+        public static UncertainBool operator |(UncertainBool a, bool b) => b | a;
 
         public static UncertainBool operator !(UncertainBool b) => b.IsCertain ? !b.Value : b;
 
