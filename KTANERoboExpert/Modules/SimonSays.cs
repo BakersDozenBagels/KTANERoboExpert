@@ -40,7 +40,10 @@ public class SimonSays : RoboExpertModule
             _ => throw new UnreachableException($"Unexpected color {p}")
         }).Conjoin());
         if (colors.Length == 5)
+        {
             ExitSubmenu();
+            Solve();
+        }
     }
 
     public override void Select()
@@ -49,5 +52,5 @@ public class SimonSays : RoboExpertModule
         Edgework.SerialNumber.Fill(() => { });
     }
 
-    public override void Cancel() => Solve();
+    public override void Cancel() => Load(Solve);
 }

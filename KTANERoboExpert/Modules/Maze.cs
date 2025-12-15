@@ -111,7 +111,7 @@ public class Maze : RoboExpertModule
     {
         if (_data is { Solved: false } d)
         {
-            Solve();
+            Load(() => Solve());
             _data = d with { Solved = true };
         }
     }

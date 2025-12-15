@@ -34,7 +34,7 @@ namespace KTANERoboExpert.Uncertain
         }
 
         /// <inheritdoc/>
-        public void Fill(Action onFill, Action? onCancel = null) => _values[1].Item1.Fill(onFill, onCancel);
+        public void Fill(Action onFill, Action? onCancel = null) => _values[0].Item1.Fill(onFill, onCancel);
 
         /// <summary>
         /// A condition and the result of it being true.
@@ -54,7 +54,7 @@ namespace KTANERoboExpert.Uncertain
             else
             {
                 _values = [(key, value)];
-                Exhaustive = !key.IsCertain || !key.Value;
+                Exhaustive = false;
             }
         }
         private UncertainCondition((UncertainBool, T)[] values, bool exhaustive)

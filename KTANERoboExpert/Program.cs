@@ -82,6 +82,22 @@ internal static partial class Program
         RoboExpertAPI.OnRegisterSolveHandler += h => _onSolveHandlers.Add(h);
         RoboExpertAPI.OnUnregisterSolveHandler += h => _onSolveHandlers.Remove(h);
 
+        Queue<Action<Action>> interrupts = [];
+        void yield()
+        {
+            interrupts.Dequeue();
+            if (interrupts.Count is not 0)
+                interrupts.Peek()(yield);
+        }
+        RoboExpertAPI.OnInterrupt += c =>
+        {
+            interrupts.Enqueue(c);
+            if (interrupts.Count is 1)
+                c(yield);
+        };
+
+        RoboExpertAPI.OnLoad += Load;
+
         _modules = AppDomain
             .CurrentDomain
             .GetAssemblies()
@@ -97,7 +113,6 @@ internal static partial class Program
 
         var selectModule = new GrammarBuilder("module");
         selectModule.Append(moduleName);
-
 
         var all = new Choices();
         all.Add(selectModule);
@@ -119,7 +134,7 @@ internal static partial class Program
             letter.Add(c);
             character.Add(c);
         }
-        var number = new Choices(Enumerable.Range(0, 102).Select(x => x.ToString()).ToArray());
+        var number = new Choices(RoboExpertModule.Numbers.ToArray());
 
         var serialb = new GrammarBuilder();
         var serialb2 = new GrammarBuilder("serial");
@@ -391,14 +406,13 @@ internal static partial class Program
             if (e.Result.Text == "cancel")
             {
                 if (_contexts.Count == 0)
-                {
                     Speak("nothing to cancel");
-                }
                 else
                 {
-                    _contexts.Peek().Module?.Cancel();
+                    var module = _contexts.Peek().Module;
                     ExitSubmenu();
                     Load(() => Speak("cancelled"));
+                    module?.Cancel();
                     _edgeworkCancel?.Invoke();
                     _edgeworkCancel = null;
                 }

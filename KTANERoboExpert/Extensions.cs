@@ -47,6 +47,35 @@ internal static class Extensions
     }
 
     /// <summary>
+    /// Expands a list to contain at least <paramref name="count"/> items, filling any new ones with a default value.
+    /// </summary>
+    public static void SparseExpand<T>(this List<T> l, int count, Func<T> @default) => l.SparseExpand(count, i => @default());
+    /// <summary>
+    /// Expands a list to contain at least <paramref name="count"/> items, filling any new ones with a default value.
+    /// </summary>
+    public static void SparseExpand<T>(this List<T> l, int count, Func<int, T> @default)
+    {
+        for (int i = l.Count; i < count; i++)
+            l.Add(@default(i));
+    }
+    /// <summary>
+    /// Sets a list item while filling any missing indices with a default value.
+    /// </summary>
+    public static void SparseSet<T>(this List<T> l, int index, T value, Func<T> @default) => l.SparseSet(index, value, i => @default());
+    /// <summary>
+    /// Sets a list item while filling any missing indices with a default value.
+    /// </summary>
+    public static void SparseSet<T>(this List<T> l, int index, T value, Func<int, T> @default)
+    {
+        for (int i = l.Count; i < index - 1; i++)
+            l.Add(@default(i));
+        if (l.Count > index)
+            l[index] = value;
+        else
+            l.Add(value);
+    }
+
+    /// <summary>
     /// Maps this value to value to an <see cref="UncertainBool"/> if it is certain, or propogates uncertainty otherwise.
     /// </summary>
     public static UncertainBool Matches<T>(this IUncertain<T> u, Func<T, UncertainBool> predicate) =>

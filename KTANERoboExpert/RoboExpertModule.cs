@@ -54,6 +54,11 @@ public abstract class RoboExpertModule
     /// </summary>
     protected void Solve() => RoboExpertAPI.Solve(Name);
     /// <summary>
+    /// Call this to interrupt whatever is going on. Call the supplied `yield` function to end the interruption.
+    /// </summary>
+    protected static void Interrupt(Action<Action> callback) => RoboExpertAPI.Interrupt(callback);
+    protected static void Load(Action callback) => RoboExpertAPI.Load(callback);
+    /// <summary>
     /// Use this to (de-)register a handler for when any module, including this one, is solved.
     /// </summary>
     protected static event Action<string?> OnSolve { add => RoboExpertAPI.RegisterSolveHandler(value); remove => RoboExpertAPI.UnregisterSolveHandler(value); }
@@ -65,6 +70,10 @@ public abstract class RoboExpertModule
     /// The NATO phonetic alphabet.
     /// </summary>
     protected internal static readonly IReadOnlyCollection<string> NATO = ["alfa", "bravo", "charlie", "delta", "echo", "foxtrot", "golf", "hotel", "india", "juliet", "kilo", "lima", "mike", "november", "oscar", "papa", "quebec", "romeo", "sierra", "tango", "uniform", "victor", "whiskey", "xray", "yankee", "zulu"];
+    /// <summary>
+    /// The numbers 0 to 101.
+    /// </summary>
+    protected internal static readonly IReadOnlyCollection<string> Numbers = [.. Enumerable.Range(0, 102).Select(x => x.ToString())];
 
     /// <summary>
     /// The name of the module this class solves.

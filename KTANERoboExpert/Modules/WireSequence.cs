@@ -60,6 +60,8 @@ public class WireSequence : RoboExpertModule
                     }
                 }
 
+                Speak(commands.Conjoin());
+
                 if (newState.Stage >= 10)
                 {
                     _undo.NewModule();
@@ -68,8 +70,6 @@ public class WireSequence : RoboExpertModule
                 }
                 else
                     _undo.Do(newState);
-
-                Speak(commands.Conjoin());
                 break;
         }
     }
