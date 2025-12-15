@@ -7,7 +7,7 @@ namespace KTANERoboExpert;
 /// Represents an item which may or may not be present.
 /// </summary>
 /// <typeparam name="T">The type of item</typeparam>
-public readonly struct Maybe<T> : IEnumerable<T>, IOrderedEnumerable<T>
+public readonly struct Maybe<T> : IEnumerable<T>, IOrderedEnumerable<T>, IEquatable<Maybe<T>>
 {
     /// <summary>
     /// <see langword="true"/> when the item exists, <see langword="false"/> otherwise.
@@ -46,4 +46,10 @@ public readonly struct Maybe<T> : IEnumerable<T>, IOrderedEnumerable<T>
         IComparer<TKey>? comparer,
         bool descending
     ) => this;
+
+    public override bool Equals(object? obj) => obj is Maybe<T> maybe && Equals(maybe);
+    public bool Equals(Maybe<T> other) => Exists == other.Exists && EqualityComparer<T?>.Default.Equals(Item, other.Item);
+    public static bool operator ==(Maybe<T> left, Maybe<T> right) => left.Equals(right);
+    public static bool operator !=(Maybe<T> left, Maybe<T> right) => !(left == right);
+    public override int GetHashCode() => HashCode.Combine(Exists, Item);
 }

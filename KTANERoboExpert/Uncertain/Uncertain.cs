@@ -1,0 +1,49 @@
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace KTANERoboExpert.Uncertain
+{
+    /// <inheritdoc cref="IUncertain{T}"/>
+    public class Uncertain<T> : IUncertain<T>
+    {
+        private readonly Maybe<T> _value;
+        protected readonly Maybe<Action> _getValue;
+
+        /// <summary>
+        /// A definitely known value.
+        /// </summary>
+        public Uncertain(T value)
+        {
+            _value = new(value);
+            _getValue = new();
+        }
+        /// <summary>
+        /// A definitely unknown value.
+        /// </summary>
+        public Uncertain(Action getValue)
+        {
+            _value = new();
+            _getValue = new(getValue);
+        }
+
+        /// <inheritdoc/>
+        [MemberNotNullWhen(true, nameof(Value))]
+        public bool IsCertain => _value.Exists;
+
+        /// <inheritdoc/>
+        public T? Value => _value.Item;
+        /// <inheritdoc/>
+        public void Fill()
+        {
+            if (!_getValue.Exists)
+                return;
+            _getValue.Item();
+        }
+
+        /// <inheritdoc cref="Uncertain{T}.Uncertain(T)"/>
+        public static implicit operator Uncertain<T>(T value) => new(value);
+        /// <inheritdoc cref="Uncertain{T}.Uncertain(Action)"/>
+        public static explicit operator Uncertain<T>(Action getValue) => new(getValue);
+        /// <inheritdoc cref="Uncertain{T}.Value"/>
+        public static explicit operator T(Uncertain<T> u) => u.Value!;
+    }
+}
