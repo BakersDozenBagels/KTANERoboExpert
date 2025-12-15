@@ -118,8 +118,9 @@ internal static partial class Program
         all.Add(selectModule);
         all.Add("edgework");
         all.Add("reset");
+        all.Add("solve");
         _defaultGrammar = new Grammar(all.ToGrammarBuilder());
-        _globalGrammar = new Grammar(new GrammarBuilder(new Choices("cancel", "strike", "solve")));
+        _globalGrammar = new Grammar(new GrammarBuilder(new Choices("cancel", "strike")));
 
         var digit = new Choices();
         var letter = new Choices();
@@ -422,8 +423,6 @@ internal static partial class Program
                 _edgework = _edgework with { Strikes = _edgework.Strikes + 1 };
                 Speak("strike " + _edgework.Strikes);
             }
-            else if (e.Result.Text == "solve")
-                HandleSolve(null);
         }
         else if (_edgeworkGrammars.Contains(e.Result.Grammar))
         {
@@ -479,6 +478,8 @@ internal static partial class Program
                     _resetConfirm = false;
                 }
             }
+            else if (command.StartsWith("solve"))
+                HandleSolve(null);
         }
         else if (_contexts.Count > 0)
         {
