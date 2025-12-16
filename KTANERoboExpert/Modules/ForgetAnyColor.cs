@@ -166,12 +166,12 @@ public partial class ForgetAnyColor : RoboExpertModule
 
     private Maybe<int> Solve(string number, string cylinder, string nixie, string gear, string command)
     {
-        UncertainInt exclude = gear switch
+        var exclude = gear switch
         {
             "red" => Edgework.Batteries,
             "orange" => Edgework.IndicatorCount,
             "yellow" => Edgework.PortPlateCount,
-            "green" => Edgework.SerialNumberDigits().Map(d => d.First()).AsUncertainInt(),
+            "green" => Edgework.SerialNumberDigits().Map(d => d.First()),
             "cyan" => Edgework.BatteryHolders,
             "blue" => Edgework.Indicators.Where(i => !i.Lit).Count,
             "purple" => Edgework.PortCount,

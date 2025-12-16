@@ -122,7 +122,7 @@ internal static partial class Program
         all.Add("reset");
         all.Add("solve");
         _defaultGrammar = new Grammar(all.ToGrammarBuilder());
-        _globalGrammar = new Grammar(new GrammarBuilder(new Choices("cancel", "strike")));
+        _globalGrammar = new Grammar(new GrammarBuilder(new Choices("cancel", "strike", "pause", "unpause")));
 
         var digit = new Choices();
         var letter = new Choices();
@@ -401,6 +401,9 @@ internal static partial class Program
     {
         if (!_listening) return;
 
+        if (_subtitlesOn)
+            Console.WriteLine("# " + e.Result.Text);
+
         if (e.Result.Grammar != _defaultGrammar || !e.Result.Text.StartsWith("reset"))
             _resetConfirm = false;
 
@@ -424,6 +427,18 @@ internal static partial class Program
             {
                 _edgework = _edgework with { Strikes = _edgework.Strikes + 1 };
                 Speak("strike " + _edgework.Strikes);
+            }
+            else if (e.Result.Text == "pause")
+            {
+                if (_listening)
+                    Speak("Goodbye");
+                _listening = false;
+            }
+            else if (e.Result.Text == "unpause")
+            {
+                if (!_listening)
+                    Speak("Hello");
+                _listening = true;
             }
         }
         else if (_edgeworkGrammars.Contains(e.Result.Grammar))
@@ -643,7 +658,7 @@ internal static partial class Program
             new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Indicators, a, b)),
             new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Ports, a, b)),
             0,
-            UncertainInt.AtLeast(0, (a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Solves, a, b)),
+            UncertainInt.InRange(0, 0, (a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Solves, a, b)),
             UncertainInt.AtLeast(0, (a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.ModuleCount, a, b)),
             5);
     }
