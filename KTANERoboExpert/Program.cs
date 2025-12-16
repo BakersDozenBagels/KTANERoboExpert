@@ -85,7 +85,7 @@ internal static partial class Program
         Queue<Action<Action>> interrupts = [];
         Action yield(Action<Action> c) => () =>
             {
-                if (interrupts.Peek() != c)
+                if (interrupts.Count is 0 || interrupts.Peek() != c)
                     return;
                 interrupts.Dequeue();
                 if (interrupts.Count is not 0)
@@ -121,8 +121,10 @@ internal static partial class Program
         all.Add("edgework");
         all.Add("reset");
         all.Add("solve");
+        all.Add("pause");
+        all.Add("unpause");
         _defaultGrammar = new Grammar(all.ToGrammarBuilder());
-        _globalGrammar = new Grammar(new GrammarBuilder(new Choices("cancel", "strike", "pause", "unpause")));
+        _globalGrammar = new Grammar(new GrammarBuilder(new Choices("cancel", "strike")));
 
         var digit = new Choices();
         var letter = new Choices();
@@ -399,6 +401,16 @@ internal static partial class Program
 
     private static void Recognized(object? sender, SpeechRecognizedEventArgs e)
     {
+        if (e.Result.Grammar == _defaultGrammar && e.Result.Text == "unpause")
+        {
+            if (_subtitlesOn)
+                Console.WriteLine("# " + e.Result.Text);
+            if (!_listening)
+                Speak("Hello");
+            _listening = true;
+            return;
+        }
+
         if (!_listening) return;
 
         if (_subtitlesOn)
@@ -427,18 +439,6 @@ internal static partial class Program
             {
                 _edgework = _edgework with { Strikes = _edgework.Strikes + 1 };
                 Speak("strike " + _edgework.Strikes);
-            }
-            else if (e.Result.Text == "pause")
-            {
-                if (_listening)
-                    Speak("Goodbye");
-                _listening = false;
-            }
-            else if (e.Result.Text == "unpause")
-            {
-                if (!_listening)
-                    Speak("Hello");
-                _listening = true;
             }
         }
         else if (_edgeworkGrammars.Contains(e.Result.Grammar))
@@ -497,6 +497,12 @@ internal static partial class Program
             }
             else if (command.StartsWith("solve"))
                 HandleSolve(null);
+            else if (e.Result.Text == "pause")
+            {
+                if (_listening)
+                    Speak("Goodbye");
+                _listening = false;
+            }
         }
         else if (_contexts.Count > 0)
         {

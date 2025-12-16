@@ -49,7 +49,7 @@ public class DividedSquares : RoboExpertModule
             }
             solves += _division.OrElse(1) * _division.OrElse(1) - 1;
 
-            Speak("For " + solves + " solves");
+            Speak("At " + solves + " solves");
 
             if ((Edgework.Solves >= solves).OrElse(false))
             {

@@ -28,13 +28,13 @@ public partial class ForgetItNot : RoboExpertModule
             {
                 _submenu = new();
                 ExitSubmenu();
-                Speak("noted");
+                Speak(command + ", noted");
                 _submenuYield!();
             }
             else
             {
                 _submenu = _submenu.Map(x => x + 1);
-                Speak("module " + (_submenu.Item + 1));
+                Speak(command);
             }
             return;
         }
@@ -74,7 +74,7 @@ public partial class ForgetItNot : RoboExpertModule
             _stages.SparseExpand(ix, () => []);
 
             _stages[ix - 1].SparseSet(stage - 1, digit, () => new(AskStage));
-            Speak("noted");
+            Speak("Stage " + stage + " is " + digit);
             ExitSubmenu();
         }
         else if (ModuleRegex().Match(command) is { Success: true, Groups: [_, var counts] } && int.Parse(counts.Value) is var count)
