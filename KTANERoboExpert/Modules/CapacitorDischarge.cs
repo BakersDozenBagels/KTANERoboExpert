@@ -14,7 +14,7 @@ public class CapacitorDischarge : RoboExpertModule
 
     public override void Select()
     {
-        Speak("Really?");
+        Speak("Hold the lever.");
         ExitSubmenu();
     }
 }
