@@ -20,7 +20,7 @@ public class SimonSays : RoboExpertModule
 
         string[] names = ["red", "blue", "green", "yellow"];
         int[] table =
-            (Edgework.HasSerialNumberVowel().Value, Edgework.Strikes) switch
+            (Edgework.SerialNumberVowels().Any(), Edgework.Strikes) switch
             {
                 (true, 0) => [1, 0, 3, 2],
                 (true, 1) => [3, 2, 1, 0],

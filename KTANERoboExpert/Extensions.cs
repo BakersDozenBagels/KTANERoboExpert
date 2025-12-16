@@ -1,4 +1,5 @@
 ﻿using KTANERoboExpert.Uncertain;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace KTANERoboExpert;
@@ -59,6 +60,19 @@ internal static class Extensions
             l.Add(@default(i));
     }
     /// <summary>
+    /// Expands a new list to contain at least <paramref name="count"/> items, filling any new ones with a default value.
+    /// </summary>
+    public static List<T> SparseExpanded<T>(this IEnumerable<T> l, int count, Func<T> @default) => l.SparseExpanded(count, i => @default());
+    /// <summary>
+    /// Expands a new list to contain at least <paramref name="count"/> items, filling any new ones with a default value.
+    /// </summary>
+    public static List<T> SparseExpanded<T>(this IEnumerable<T> l, int count, Func<int, T> @default)
+    {
+        var lc = l.ToList();
+        lc.SparseExpand(count, @default);
+        return lc;
+    }
+    /// <summary>
     /// Sets a list item while filling any missing indices with a default value.
     /// </summary>
     public static void SparseSet<T>(this List<T> l, int index, T value, Func<T> @default) => l.SparseSet(index, value, i => @default());
@@ -114,4 +128,8 @@ internal static class Extensions
         edgework.Indicators.IsCertain
             ? new(edgework.Indicators.Value.Any(i => (!label.Exists || i.Label == label.Item) && (!lit.Exists || i.Lit == lit.Item)))
             : new(edgework.Indicators.Fill);
+
+    public static UncertainInt AsUncertainInt(this IUncertain<int> i, Maybe<int> min = default, Maybe<int> max = default) =>
+        i.IsCertain ? i.Value : new UncertainInt(i.Fill, min, max);
+    public static UncertainInt Coalesce(this UncertainInt u, UncertainInt other) => u.IsCertain ? u : new UncertainInt(u.Fill, other.Min, other.Max);
 }

@@ -16,8 +16,8 @@ public record Edgework(
     Uncertain<string> SerialNumber,
     UncertainInt Batteries,
     UncertainInt BatteryHolders,
-    Uncertain<IReadOnlyCollection<Indicator>> Indicators,
-    Uncertain<IReadOnlyCollection<PortPlate>> Ports,
+    UncertainEnumerable<Indicator> Indicators,
+    UncertainEnumerable<PortPlate> Ports,
     int Strikes,
     UncertainInt Solves,
     UncertainInt ModuleCount,
@@ -35,13 +35,27 @@ public record Edgework(
     } = Batteries;
 
     internal UncertainInt _batteryHolders { get => field.ButAtLeast(0).ButAtMost(WidgetCount); init => field = value; } = BatteryHolders;
-    public UncertainInt BatteryHolders => _batteryHolders.Map(c => new UncertainInt(c)).OrElse(WidgetCount - (_indicatorCount + _portPlateCount).ButAtMost(WidgetCount));
+    public UncertainInt BatteryHolders => _batteryHolders.Coalesce(WidgetCount - (_indicatorCount + _portPlateCount).ButAtMost(WidgetCount));
 
-    private UncertainInt _indicatorCount => Indicators.Map(c => new UncertainInt(c.Count)).OrElse(UncertainInt.AtLeast(0, Indicators.Fill).ButAtMost(WidgetCount));
-    public UncertainInt IndicatorCount => Indicators.Map(c => new UncertainInt(c.Count)).OrElse(WidgetCount - (_batteryHolders + _portPlateCount).ButAtMost(WidgetCount));
+    private UncertainInt _indicatorCount => Indicators.Count.Coalesce(UncertainInt.AtLeast(0, Indicators.Fill).ButAtMost(WidgetCount));
+    public UncertainInt IndicatorCount => Indicators.Count.Coalesce(WidgetCount - (_batteryHolders + _portPlateCount).ButAtMost(WidgetCount));
 
-    private UncertainInt _portPlateCount => Ports.Map(c => new UncertainInt(c.Count)).OrElse(UncertainInt.AtLeast(0, Indicators.Fill).ButAtMost(WidgetCount));
-    public UncertainInt PortPlateCount => Ports.Map(c => new UncertainInt(c.Count)).OrElse(WidgetCount - (_batteryHolders + _indicatorCount).ButAtMost(WidgetCount));
+    private UncertainInt _portPlateCount => Ports.Count.Coalesce(UncertainInt.AtLeast(0, Indicators.Fill).ButAtMost(WidgetCount));
+    public UncertainInt PortPlateCount => Ports.Count.Coalesce(WidgetCount - (_batteryHolders + _indicatorCount).ButAtMost(WidgetCount));
+
+    public UncertainInt PortCount => Ports.Map(pl => pl.Sum(CountPlate)).AsUncertainInt().Coalesce(PortPlateCount * UncertainInt.InRange(0, 4, Ports.Fill));
+
+    public static int CountPlate(PortPlate pl)
+    {
+        int c = 0;
+        if (pl.DVID) c++;
+        if (pl.Parallel) c++;
+        if (pl.PS2) c++;
+        if (pl.RJ45) c++;
+        if (pl.Serial) c++;
+        if (pl.StereoRCA) c++;
+        return c;
+    }
 
     /// <summary>
     /// Represents an indicator.

@@ -554,14 +554,13 @@ internal static partial class Program
             {
                 _edgework = _edgework with
                 {
-                    Indicators = IndicatorsRegex()
+                    Indicators = new([..IndicatorsRegex()
                     .Matches(command)
-                    .Select(m => new Edgework.Indicator(m.Groups[2].Value.Replace(" ", "").ToUpperInvariant() is var ind && ind == "MIKESA" ? "MSA" : ind == "NOVEMBERSA" ? "NSA" : ind, m.Groups[1].Value == "lit"))
-                    .ToList()
+                    .Select(m => new Edgework.Indicator(m.Groups[2].Value.Replace(" ", "").ToUpperInvariant() is var ind && ind == "MIKESA" ? "MSA" : ind == "NOVEMBERSA" ? "NSA" : ind, m.Groups[1].Value == "lit"))])
                 };
             }
 
-            Speak(_edgework.Indicators.Value!.Count + " indicator" + (_edgework.Indicators.Value!.Count == 1 ? "" : "s"));
+            Speak(_edgework.Indicators.Count.Value + " indicator" + (_edgework.Indicators.Count.Value == 1 ? "" : "s"));
         }
         else if (_edgeworkQuery == RoboExpertModule.EdgeworkType.Ports || (_edgeworkQuery == null && command.StartsWith("ports ")))
         {

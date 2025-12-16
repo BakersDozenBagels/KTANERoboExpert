@@ -20,7 +20,7 @@
         /// A definitely unknown integer.
         /// </summary>
         public UncertainInt(Action<Action, Action?> getValue) : base(getValue) { }
-        private UncertainInt(Action<Action, Action?> getValue, Maybe<int> min, Maybe<int> max) : base(getValue)
+        internal UncertainInt(Action<Action, Action?> getValue, Maybe<int> min, Maybe<int> max) : base(getValue)
         {
             _min = min;
             _max = max;

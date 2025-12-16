@@ -11,7 +11,7 @@ public partial class ForgetItNot : RoboExpertModule
     private Grammar? _grammar, _subgrammar;
     public override Grammar Grammar => _grammar ??= new(new Choices(
         new GrammarBuilder(new GrammarBuilder("module") + new Choices(Numbers.ToArray()), 0, 1) + "stage" + new Choices(Numbers.ToArray()) + "is" + new Choices(Enumerable.Range(0, 10).Select(i => i.ToString()).ToArray()),
-        new GrammarBuilder((new Choices(Numbers.ToArray()))) + "modules",
+        new GrammarBuilder(new Choices(Numbers.ToArray())) + "modules",
         "go" + new GrammarBuilder(new Choices(Numbers.ToArray()), 0, 1)) + new GrammarBuilder("stage" + new GrammarBuilder(new Choices(Numbers.ToArray())), 0, 1));
     private Grammar Subgrammar => _subgrammar ??= new(new Choices(Enumerable.Range(0, 10).Select(i => i.ToString()).ToArray()));
 
