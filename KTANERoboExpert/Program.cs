@@ -591,7 +591,7 @@ internal static partial class Program
                 command = command[6..];
             if (command == "none")
             {
-                _edgework = _edgework with { Ports = new([]) };
+                _edgework = _edgework with { _ports = new([]) };
                 Speak("0 port plates");
             }
             else
@@ -613,7 +613,7 @@ internal static partial class Program
                     .ToArray();
                 if (plates.Any(p => !p.Exists))
                     return;
-                _edgework = _edgework with { Ports = new([.. plates.Select(x => x.Item)]) };
+                _edgework = _edgework with { _ports = new([.. plates.Select(x => x.Item)]) };
                 Speak(plates.Length + " port plate" + (plates.Length > 1 ? "s" : ""));
             }
         }

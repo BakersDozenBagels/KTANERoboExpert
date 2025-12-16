@@ -130,6 +130,6 @@ internal static class Extensions
             : new(edgework.Indicators.Fill);
 
     public static UncertainInt AsUncertainInt(this IUncertain<int> i, Maybe<int> min = default, Maybe<int> max = default) =>
-        i.IsCertain ? i.Value : new UncertainInt(i.Fill, min, max);
-    public static UncertainInt Coalesce(this UncertainInt u, UncertainInt other) => u.IsCertain ? u : new UncertainInt(u.Fill, other.Min, other.Max);
+        i.IsCertain ? i.Value : UncertainInt.InRange(min, max, i.Fill);
+    public static UncertainInt Coalesce(this UncertainInt u, UncertainInt other) => u.IsCertain ? u : UncertainInt.InRange(other.Min, other.Max, u.Fill);
 }

@@ -2,7 +2,7 @@
 
 namespace KTANERoboExpert.Modules;
 
-public partial class DigitalRoot : RoboExpertModule
+public class DigitalRoot : RoboExpertModule
 {
     public override string Name => "Digital Root";
     public override string Help => "1 2 3 6";

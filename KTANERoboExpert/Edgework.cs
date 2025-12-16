@@ -40,10 +40,16 @@ public record Edgework(
     private UncertainInt _indicatorCount => Indicators.Count.Coalesce(UncertainInt.AtLeast(0, Indicators.Fill).ButAtMost(WidgetCount));
     public UncertainInt IndicatorCount => Indicators.Count.Coalesce(WidgetCount - (_batteryHolders + _portPlateCount).ButAtMost(WidgetCount));
 
-    private UncertainInt _portPlateCount => Ports.Count.Coalesce(UncertainInt.AtLeast(0, Indicators.Fill).ButAtMost(WidgetCount));
-    public UncertainInt PortPlateCount => Ports.Count.Coalesce(WidgetCount - (_batteryHolders + _indicatorCount).ButAtMost(WidgetCount));
+    internal UncertainEnumerable<PortPlate> _ports { get; init; } = Ports;
+    public UncertainEnumerable<PortPlate> Ports { get => _ports.IsCertain ? _ports : new(_ports.Fill, 0, PortPlateCount.Max); }
+
+    private UncertainInt _portPlateCount => _ports.Count.Coalesce(UncertainInt.AtLeast(0, Indicators.Fill).ButAtMost(WidgetCount));
+    public UncertainInt PortPlateCount => _ports.Count.Coalesce(WidgetCount - (_batteryHolders + _indicatorCount).ButAtMost(WidgetCount));
 
     public UncertainInt PortCount => Ports.Map(pl => pl.Sum(CountPlate)).AsUncertainInt().Coalesce(PortPlateCount * UncertainInt.InRange(0, 4, Ports.Fill));
+
+    public UncertainInt AABatteries => (2 * (Batteries - BatteryHolders)).ButWithinRange(0, Batteries);
+    public UncertainInt DBatteries => (2 * BatteryHolders - Batteries).ButWithinRange(0, Batteries);
 
     public static int CountPlate(PortPlate pl)
     {
