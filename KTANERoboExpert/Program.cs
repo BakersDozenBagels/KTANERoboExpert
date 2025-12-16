@@ -83,17 +83,19 @@ internal static partial class Program
         RoboExpertAPI.OnUnregisterSolveHandler += h => _onSolveHandlers.Remove(h);
 
         Queue<Action<Action>> interrupts = [];
-        void yield()
-        {
-            interrupts.Dequeue();
-            if (interrupts.Count is not 0)
-                interrupts.Peek()(yield);
-        }
+        Action yield(Action<Action> c) => () =>
+            {
+                if (interrupts.Peek() != c)
+                    return;
+                interrupts.Dequeue();
+                if (interrupts.Count is not 0)
+                    interrupts.Peek()(yield(interrupts.Peek()));
+            };
         RoboExpertAPI.OnInterrupt += c =>
         {
             interrupts.Enqueue(c);
             if (interrupts.Count is 1)
-                c(yield);
+                c(yield(c));
         };
 
         RoboExpertAPI.OnLoad += Load;

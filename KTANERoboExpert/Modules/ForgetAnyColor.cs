@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 
 namespace KTANERoboExpert.Modules;
 
+// TODO: fix the undoing here, it's so rough
+
 public partial class ForgetAnyColor : RoboExpertModule
 {
     public override string Name => "Forget Any Color";
@@ -234,10 +236,7 @@ public partial class ForgetAnyColor : RoboExpertModule
     public override void Cancel()
     {
         if (_yield is { })
-        {
             _yield();
-            _yield = null;
-        }
 
         var s = _state.Current;
         s.submenu = default;

@@ -111,11 +111,8 @@ public partial class ForgetItNot : RoboExpertModule
 
     public override void Cancel()
     {
-        if (_submenuYield is not null)
-        {
+        if (_submenuYield is { })
             _submenuYield();
-            _submenuYield = null;
-        }
         _submenu = new();
     }
 
