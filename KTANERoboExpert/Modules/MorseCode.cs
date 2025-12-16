@@ -427,7 +427,7 @@ public class MorseCode : RoboExpertModule
             {
                 if (res.Length is not 0)
                     res.Append(' ');
-                if (lang.Exists && lang.Item == "no" && c == 'È')
+                if (lang.Exists && lang.Item == "no" && c == 'è')
                     res.Append("..-..");
                 else
                     res.Append(_letters[c]);
