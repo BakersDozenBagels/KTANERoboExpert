@@ -2,7 +2,7 @@
 using System.Speech.Recognition;
 using System.Text;
 
-namespace KTANERoboExpert.Modules;
+namespace KTANERoboExpert.Modules.Vanilla;
 
 public class MorseCode : RoboExpertModule
 {

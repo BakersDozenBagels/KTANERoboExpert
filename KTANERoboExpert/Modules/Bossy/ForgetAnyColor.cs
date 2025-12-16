@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Speech.Recognition;
 using System.Text.RegularExpressions;
 
-namespace KTANERoboExpert.Modules;
+namespace KTANERoboExpert.Modules.Bossy;
 
 // TODO: fix the undoing here, it's so rough
 

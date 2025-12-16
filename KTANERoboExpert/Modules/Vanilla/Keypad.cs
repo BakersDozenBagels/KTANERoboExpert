@@ -1,6 +1,6 @@
 ﻿using System.Speech.Recognition;
 
-namespace KTANERoboExpert.Modules;
+namespace KTANERoboExpert.Modules.Vanilla;
 
 public class Keypad : RoboExpertModule
 {

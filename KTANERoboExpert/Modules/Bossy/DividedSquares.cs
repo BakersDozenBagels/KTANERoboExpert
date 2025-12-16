@@ -1,6 +1,6 @@
 ﻿using System.Speech.Recognition;
 
-namespace KTANERoboExpert.Modules;
+namespace KTANERoboExpert.Modules.Bossy;
 
 public class DividedSquares : RoboExpertModule
 {

@@ -100,14 +100,13 @@ internal static partial class Program
 
         RoboExpertAPI.OnLoad += Load;
 
-        _modules = AppDomain
+        _modules = [.. AppDomain
             .CurrentDomain
             .GetAssemblies()
             .SelectMany(a => a.GetExportedTypes())
             .Where(t => typeof(RoboExpertModule).IsAssignableFrom(t) && !t.IsAbstract)
             .Select(Activator.CreateInstance)
-            .Cast<RoboExpertModule>()
-            .ToArray();
+            .Cast<RoboExpertModule>()];
 
         var moduleName = new Choices();
         foreach (var m in _modules)

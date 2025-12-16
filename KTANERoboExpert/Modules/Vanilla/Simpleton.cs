@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics;
 using System.Speech.Recognition;
 
-namespace KTANERoboExpert.Modules;
+namespace KTANERoboExpert.Modules.Vanilla;
 
-public class CapacitorDischarge : RoboExpertModule
+public class Simpleton : RoboExpertModule
 {
-    public override string Name => "Capacitor Discharge";
+    public override string Name => "Simpleton";
     public override string Help => "";
     private Grammar? _grammar;
     public override Grammar Grammar => _grammar ??= new(new GrammarBuilder("unused"));
@@ -14,7 +14,8 @@ public class CapacitorDischarge : RoboExpertModule
 
     public override void Select()
     {
-        Speak("Hold the lever.");
+        Speak("Push the button.");
         ExitSubmenu();
+        Solve();
     }
 }
