@@ -4,7 +4,7 @@ using System.Speech.Recognition;
 
 namespace KTANERoboExpert.Modules;
 
-public partial class Sink : RoboExpertModule
+public class Sink : RoboExpertModule
 {
     public override string Name => "Sink";
     public override string Help => "yes | no";
