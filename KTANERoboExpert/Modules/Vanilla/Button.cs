@@ -67,7 +67,14 @@ public partial class Button : RoboExpertModule
         _holding = true;
     }
 
-    public override void Cancel() => _holding = false;
+    public override void Cancel()
+    {
+        if (_holding)
+        {
+            ExitSubmenu();
+            _holding = false;
+        }
+    }
 
     public override void Reset() => _holding = false;
 

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Speech.Recognition;
 
-namespace KTANERoboExpert.Modules.Vanilla;
+namespace KTANERoboExpert.Modules;
 
 public class Simpleton : RoboExpertModule
 {

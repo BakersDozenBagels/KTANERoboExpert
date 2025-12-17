@@ -14,7 +14,7 @@ public class SimonSays : RoboExpertModule
     {
         if (!Edgework.SerialNumber.IsCertain)
         {
-            Edgework.SerialNumber.Fill(() => ProcessCommand(command));
+            Edgework.SerialNumber.Fill(() => ProcessCommand(command), ExitSubmenu);
             return;
         }
 
@@ -49,7 +49,7 @@ public class SimonSays : RoboExpertModule
     public override void Select()
     {
         base.Select();
-        Edgework.SerialNumber.Fill(() => { });
+        Edgework.SerialNumber.Fill(() => { }, ExitSubmenu);
     }
 
     public override void Cancel() => Load(Solve);
