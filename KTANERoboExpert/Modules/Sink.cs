@@ -15,7 +15,7 @@ public partial class Sink : RoboExpertModule
     private UncertainBool[] DefaultRules => [
         UncertainBool.Of((a, _) => { Speak("Gold knobs?"); _rix = 0; }),
         UncertainBool.Of((a, _) => { Speak("Steel faucet?"); _rix = 1; }),
-        UncertainBool.Of((a, _) => { Speak("Copper pipes?"); _rix = 2; })
+        UncertainBool.Of((a, _) => { Speak("Copper drain?"); _rix = 2; })
     ];
     private UncertainBool[] Rules { get => field ??= DefaultRules; set; }
 
