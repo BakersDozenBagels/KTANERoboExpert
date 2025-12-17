@@ -11,7 +11,7 @@ namespace KTANERoboExpert.Uncertain
         /// <summary>
         /// A definitely known value.
         /// </summary>
-        public Uncertain(T value)
+        protected Uncertain(T value)
         {
             _value = new(value);
             _getValue = new();
@@ -19,11 +19,14 @@ namespace KTANERoboExpert.Uncertain
         /// <summary>
         /// A definitely unknown value.
         /// </summary>
-        public Uncertain(Action<Action, Action?> getValue)
+        protected Uncertain(Action<Action, Action?> getValue)
         {
             _value = new();
             _getValue = new(getValue);
         }
+
+        public static Uncertain<T> Of(T value) => new(value);
+        public static Uncertain<T> Of(Action<Action, Action?> getValue) => new(getValue);
 
         /// <inheritdoc/>
         [MemberNotNullWhen(true, nameof(Value))]
@@ -40,9 +43,9 @@ namespace KTANERoboExpert.Uncertain
         }
 
         /// <inheritdoc cref="Uncertain{T}.Uncertain(T)"/>
-        public static implicit operator Uncertain<T>(T value) => new(value);
+        public static implicit operator Uncertain<T>(T value) => Of(value);
         /// <inheritdoc cref="Uncertain{T}.Uncertain(Action)"/>
-        public static explicit operator Uncertain<T>(Action<Action, Action?> getValue) => new(getValue);
+        public static explicit operator Uncertain<T>(Action<Action, Action?> getValue) => Of(getValue);
         /// <inheritdoc cref="Uncertain{T}.Value"/>
         public static explicit operator T(Uncertain<T> u) => u.Value!;
     }

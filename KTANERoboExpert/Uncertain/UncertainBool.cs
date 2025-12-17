@@ -8,11 +8,14 @@
         /// <summary>
         /// A definitely known condition.
         /// </summary>
-        public UncertainBool(bool value) : base(value) { }
+        private UncertainBool(bool value) : base(value) { }
         /// <summary>
         /// A definitely unknown condition.
         /// </summary>
-        public UncertainBool(Action<Action, Action?> getValue) : base(getValue) { }
+        private UncertainBool(Action<Action, Action?> getValue) : base(getValue) { }
+
+        public static new UncertainBool Of(bool value) => new(value);
+        public static new UncertainBool Of(Action<Action, Action?> getValue) => new(getValue);
 
         /// <summary>
         /// Combines two conditions with a logical AND while correctly handling uncertainty.
@@ -20,12 +23,12 @@
         public static UncertainBool operator &(UncertainBool a, UncertainBool b)
         {
             if (a.IsCertain && b.IsCertain)
-                return new(a.Value && b.Value);
+                return Of(a.Value && b.Value);
 
             if ((a.IsCertain && !a.Value) || (b.IsCertain && !b.Value))
-                return new(false);
+                return Of(false);
 
-            return new(a.IsCertain ? b._getValue.Item! : a._getValue.Item!);
+            return Of(a.IsCertain ? b._getValue.Item! : a._getValue.Item!);
         }
 
         /// <summary>
@@ -34,12 +37,12 @@
         public static UncertainBool operator |(UncertainBool a, UncertainBool b)
         {
             if (a.IsCertain && b.IsCertain)
-                return new(a.Value || b.Value);
+                return Of(a.Value || b.Value);
 
             if ((a.IsCertain && a.Value) || (b.IsCertain && b.Value))
-                return new(true);
+                return Of(true);
 
-            return new(a.IsCertain ? b._getValue.Item! : a._getValue.Item!);
+            return Of(a.IsCertain ? b._getValue.Item! : a._getValue.Item!);
         }
 
         /// <summary>
@@ -48,9 +51,9 @@
         public static UncertainBool operator ^(UncertainBool a, UncertainBool b)
         {
             if (a.IsCertain && b.IsCertain)
-                return new(a.Value ^ b.Value);
+                return Of(a.Value ^ b.Value);
 
-            return new(a.IsCertain ? b._getValue.Item! : a._getValue.Item!);
+            return Of(a.IsCertain ? b._getValue.Item! : a._getValue.Item!);
         }
         public static UncertainBool operator &(bool a, UncertainBool b) => a ? b : false;
         public static UncertainBool operator |(bool a, UncertainBool b) => a ? true : b;
@@ -60,6 +63,6 @@
         public static UncertainBool operator !(UncertainBool b) => b.IsCertain ? !b.Value : b;
 
         /// <inheritdoc cref="UncertainBool.UncertainBool(bool)"/>
-        public static implicit operator UncertainBool(bool value) => new(value);
+        public static implicit operator UncertainBool(bool value) => Of(value);
     }
 }

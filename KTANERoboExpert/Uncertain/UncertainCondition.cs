@@ -39,7 +39,8 @@ namespace KTANERoboExpert.Uncertain
         /// <summary>
         /// A condition and the result of it being true.
         /// </summary>
-        public UncertainCondition(UncertainBool key, T value)
+        public static UncertainCondition<T> Of(UncertainBool key, T value) => new(key, value);
+        private UncertainCondition(UncertainBool key, T value)
         {
             if (key.IsCertain && !key.Value)
             {
@@ -90,6 +91,6 @@ namespace KTANERoboExpert.Uncertain
         /// <inheritdoc cref="UncertainCondition{T}.OrElse(T)"/>
         public static UncertainCondition<T> operator |(UncertainCondition<T> a, T b) => a.OrElse(b);
         /// <inheritdoc cref="UncertainCondition{T}.UncertainCondition(UncertainBool, T)"/>
-        public static implicit operator UncertainCondition<T>((UncertainBool key, T value) tup) => new(tup.key, tup.value);
+        public static implicit operator UncertainCondition<T>((UncertainBool key, T value) tup) => Of(tup.key, tup.value);
     }
 }

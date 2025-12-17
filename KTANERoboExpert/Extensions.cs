@@ -94,10 +94,10 @@ internal static class Extensions
     /// Maps this value to value to an <see cref="UncertainBool"/> if it is certain, or propogates uncertainty otherwise.
     /// </summary>
     public static UncertainBool Matches<T>(this IUncertain<T> u, Func<T, UncertainBool> predicate) =>
-        u.IsCertain ? predicate(u.Value!) : new(u.Fill);
+        u.IsCertain ? predicate(u.Value!) : UncertainBool.Of(u.Fill);
 
-    public static IUncertain<U> Map<T, U>(this IUncertain<T> u, Func<T, U> map) => u.IsCertain ? map(u.Value!) : new Uncertain<U>(u.Fill);
-    public static IUncertain<U> FlatMap<T, U>(this IUncertain<T> u, Func<T, IUncertain<U>> map) => u.IsCertain ? map(u.Value!) : new Uncertain<U>(u.Fill);
+    public static IUncertain<U> Map<T, U>(this IUncertain<T> u, Func<T, U> map) => u.IsCertain ? map(u.Value!) : Uncertain<U>.Of(u.Fill);
+    public static IUncertain<U> FlatMap<T, U>(this IUncertain<T> u, Func<T, IUncertain<U>> map) => u.IsCertain ? map(u.Value!) : Uncertain<U>.Of(u.Fill);
     public static T OrElse<T>(this IUncertain<T> u, T value) => u.IsCertain ? u.Value! : value;
 
     /// <summary>
@@ -127,13 +127,13 @@ internal static class Extensions
     /// <param name="lit">Optionally, whether the indicator should be lit or unlit.</param>
     public static UncertainBool HasIndicator(this Edgework edgework, Maybe<string> label = default, Maybe<bool> lit = default) =>
         edgework.Indicators.IsCertain
-            ? new(edgework.Indicators.Value.Any(i => (!label.Exists || i.Label == label.Item) && (!lit.Exists || i.Lit == lit.Item)))
-            : new(edgework.Indicators.Fill);
+            ? UncertainBool.Of(edgework.Indicators.Value.Any(i => (!label.Exists || i.Label == label.Item) && (!lit.Exists || i.Lit == lit.Item)))
+            : UncertainBool.Of(edgework.Indicators.Fill);
 
     public static UncertainInt AsUncertainInt(this IUncertain<int> i, Maybe<int> min = default, Maybe<int> max = default) =>
         i.IsCertain ? i.Value : UncertainInt.InRange(min, max, i.Fill);
     public static UncertainBool AsUncertainBool(this IUncertain i) =>
-        i.IsCertain ? true : new UncertainBool(i.Fill);
+        i.IsCertain ? true : UncertainBool.Of(i.Fill);
 
     public static UncertainInt Coalesce(this UncertainInt u, UncertainInt other) => u.IsCertain ? u : UncertainInt.InRange(other.Min, other.Max, u.Fill);
 }

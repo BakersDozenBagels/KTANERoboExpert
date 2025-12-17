@@ -19,7 +19,7 @@ public class Backgrounds : RoboExpertModule
         if (command.Split(' ').Select(x => Array.IndexOf(_colors, x)).ToArray() is not [var button, _, var bg])
             return;
 
-        var rowc = new UncertainCondition<int>(button == bg, 0)
+        var rowc = UncertainCondition<int>.Of(button == bg, 0)
             | ((button == 6 || button == 8) != (bg == 6 || bg == 8), 1)
             | (Edgework.DBatteries == 0, 2)
             | (Edgework.AABatteries == 0, 3)
@@ -38,7 +38,7 @@ public class Backgrounds : RoboExpertModule
 
         var row = rowc.Value;
 
-        var colc = new UncertainCondition<int>(row != 1 && ((button == 6 || button == 8) != (bg == 6 || bg == 8)), 1)
+        var colc = UncertainCondition<int>.Of(row != 1 && ((button == 6 || button == 8) != (bg == 6 || bg == 8)), 1)
             | (row != 2 & Edgework.DBatteries == 0, 4)
             | (row != 3 & Edgework.AABatteries == 0, 3)
             | (row != 4 && (button == 0 || button == 2 || button == 4) && (bg == 0 || bg == 2 || bg == 4), 5)

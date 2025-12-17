@@ -11,7 +11,7 @@
         /// <summary>
         /// A definitely known integer.
         /// </summary>
-        public UncertainInt(int value) : base(value)
+        private UncertainInt(int value) : base(value)
         {
             _min = new(value);
             _max = new(value);
@@ -19,7 +19,7 @@
         /// <summary>
         /// A definitely unknown integer.
         /// </summary>
-        public UncertainInt(Action<Action, Action?> getValue) : base(getValue) { }
+        private UncertainInt(Action<Action, Action?> getValue) : base(getValue) { }
         private UncertainInt(Action<Action, Action?> getValue, Maybe<int> min, Maybe<int> max) : base(getValue)
         {
             _min = min;
@@ -37,6 +37,9 @@
 
         /// <inheritdoc cref="UncertainInt.UncertainInt(int)"/>
         public static UncertainInt Exactly(int value) => new(value);
+
+        /// <inheritdoc cref="UncertainInt.UncertainInt(Action{Action, Action?})"/>
+        public static UncertainInt Unknown(Action<Action, Action?> getValue) => new(getValue);
         /// <summary>
         /// An unknown integer constrained to be at least some minimum value.
         /// </summary>
@@ -68,7 +71,7 @@
             y = b._min.Exists ? b._min.Item : int.MinValue;
             if (x <= y)
                 return false;
-            return new(a.IsCertain ? b._getValue.Item! : a._getValue.Item!);
+            return UncertainBool.Of(a.IsCertain ? b._getValue.Item! : a._getValue.Item!);
         }
         public static UncertainBool operator <(UncertainInt a, UncertainInt b)
         {
@@ -80,7 +83,7 @@
             y = b._max.Exists ? b._max.Item : int.MaxValue;
             if (x >= y)
                 return false;
-            return new(a.IsCertain ? b._getValue.Item! : a._getValue.Item!);
+            return UncertainBool.Of(a.IsCertain ? b._getValue.Item! : a._getValue.Item!);
         }
         public static UncertainBool operator >=(UncertainInt a, UncertainInt b) => !(a < b);
         public static UncertainBool operator <=(UncertainInt a, UncertainInt b) => !(a > b);
@@ -92,23 +95,23 @@
             if (((a < b).IsCertain && (a < b).Value) || ((a > b).IsCertain && a.Value > b.Value))
                 return false;
 
-            return new(a.IsCertain ? b._getValue.Item! : a._getValue.Item!);
+            return UncertainBool.Of(a.IsCertain ? b._getValue.Item! : a._getValue.Item!);
         }
         public static UncertainBool operator !=(UncertainInt a, UncertainInt b) => !(a == b);
 
         /// <inheritdoc cref="UncertainInt.UncertainInt(int)"/>
-        public static implicit operator UncertainInt(int value) => new(value);
+        public static implicit operator UncertainInt(int value) => Exactly(value);
 
         public static UncertainInt operator -(UncertainInt u) =>
-            u.IsCertain ? new(-u.Value) : InRange(u._getValue.Item!, u._max.Map(x => -x), u._min.Map(x => -x));
+            u.IsCertain ? Exactly(-u.Value) : InRange(u._getValue.Item!, u._max.Map(x => -x), u._min.Map(x => -x));
         public static UncertainInt operator ++(UncertainInt u) =>
-            u.IsCertain ? new(u.Value + 1) : InRange(u._getValue.Item!, u._min.Map(x => x + 1), u._max.Map(x => x + 1));
+            u.IsCertain ? Exactly(u.Value + 1) : InRange(u._getValue.Item!, u._min.Map(x => x + 1), u._max.Map(x => x + 1));
         public static UncertainInt operator --(UncertainInt u) =>
-            u.IsCertain ? new(u.Value - 1) : InRange(u._getValue.Item!, u._min.Map(x => x - 1), u._max.Map(x => x - 1));
+            u.IsCertain ? Exactly(u.Value - 1) : InRange(u._getValue.Item!, u._min.Map(x => x - 1), u._max.Map(x => x - 1));
         public static UncertainInt operator +(UncertainInt a, UncertainInt b)
         {
             if (a.IsCertain && b.IsCertain)
-                return new(a.Value + b.Value);
+                return Exactly(a.Value + b.Value);
             if (a.IsCertain)
                 return InRange(b._getValue.Item!, b._min.Map(x => x + a.Value), b._max.Map(x => x + a.Value));
             if (b.IsCertain)

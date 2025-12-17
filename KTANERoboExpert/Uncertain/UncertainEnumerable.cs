@@ -13,7 +13,7 @@ public class UncertainEnumerable<T> : Uncertain<IEnumerable<T>>, IEnumerable<T>
         _maxLength = maxLength;
     }
 
-    public static UncertainEnumerable<T> Of(IEnumerable<T> value) => new(value);
+    public static new UncertainEnumerable<T> Of(IEnumerable<T> value) => new(value);
     public static UncertainEnumerable<T> Of(Action<Action, Action?> fill, Maybe<int> minLength = default, Maybe<int> maxLength = default)
     {
         if (minLength.Exists && maxLength.Exists && minLength.Item == maxLength.Item)
@@ -30,7 +30,7 @@ public class UncertainEnumerable<T> : Uncertain<IEnumerable<T>>, IEnumerable<T>
             (true, true) => UncertainInt.InRange(_minLength.Item, _maxLength.Item, Fill),
             (true, false) => UncertainInt.AtLeast(_minLength.Item, Fill),
             (false, true) => UncertainInt.InRange(0, _maxLength.Item, Fill),
-            (false, false) => new UncertainInt(Fill)
+            (false, false) => UncertainInt.Unknown(Fill)
         };
     }
 

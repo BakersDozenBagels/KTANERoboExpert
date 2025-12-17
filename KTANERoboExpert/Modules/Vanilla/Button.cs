@@ -39,7 +39,7 @@ public partial class Button : RoboExpertModule
         var color = btn.Groups[1].Value;
         var label = btn.Groups[2].Value;
 
-        var todo = new UncertainCondition<Action>(color == "blue" && label == "abort", Hold)
+        var todo = UncertainCondition<Action>.Of(color == "blue" && label == "abort", Hold)
             | (label == "detonate" & Edgework.Batteries > 1, Tap)
             | (color == "white" & Edgework.HasIndicator("CAR", lit: true), Hold)
             | (Edgework.Batteries > 2 & Edgework.HasIndicator("FRK", lit: true), Tap)

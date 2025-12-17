@@ -26,25 +26,25 @@ public partial class Wires : RoboExpertModule
         switch (colors.Length)
         {
             case 3:
-                result = new UncertainCondition<int>(!colors.Contains("red"), 1) 
+                result = UncertainCondition<int>.Of(!colors.Contains("red"), 1) 
                     | (colors[2] == "white", 2)
                     | (colors.Count(s => s == "blue") > 1, Array.LastIndexOf(colors, "blue"))
                     | 2;
                 break;
             case 4:
-                result = new UncertainCondition<int>(colors.Count(s => s == "red") > 1 & Edgework.SerialNumber.Matches(n => (n[5] - '0') % 2 == 1), Array.LastIndexOf(colors, "red"))
+                result = UncertainCondition<int>.Of(colors.Count(s => s == "red") > 1 & Edgework.SerialNumber.Matches(n => (n[5] - '0') % 2 == 1), Array.LastIndexOf(colors, "red"))
                     | ((colors[3] == "yellow" && !colors.Contains("red")) || colors.Count(s => s == "blue") == 1, 0)
                     | (colors.Count(s => s == "yellow") > 1, 3)
                     | 1;
                 break;
             case 5:
-                result = new UncertainCondition<int>(colors[4] == "black" & Edgework.SerialNumber.Matches(n => (n[5] - '0') % 2 == 1), 3)
+                result = UncertainCondition<int>.Of(colors[4] == "black" & Edgework.SerialNumber.Matches(n => (n[5] - '0') % 2 == 1), 3)
                     | (colors.Count(s => s == "red") == 1 && colors.Count(s => s == "yellow") > 1, 0)
                     | (!colors.Contains("black"), 1)
                     | 0;
                 break;
             case 6:
-                result = new UncertainCondition<int>(!colors.Contains("yellow") & Edgework.SerialNumber.Matches(n => (n[5] - '0') % 2 == 1), 2)
+                result = UncertainCondition<int>.Of(!colors.Contains("yellow") & Edgework.SerialNumber.Matches(n => (n[5] - '0') % 2 == 1), 2)
                     | (colors.Count(s => s == "yellow") == 1 && colors.Count(s => s == "white") > 1, 3)
                     | (!colors.Contains("red"), 5)
                     | 3;

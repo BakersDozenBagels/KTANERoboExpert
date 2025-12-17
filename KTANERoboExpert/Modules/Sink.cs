@@ -13,9 +13,9 @@ public partial class Sink : RoboExpertModule
 
     private Maybe<int> _rix = default;
     private UncertainBool[] DefaultRules => [
-        new((a, _) => { Speak("Gold knobs?"); _rix = 0; }),
-        new((a, _) => { Speak("Steel faucet?"); _rix = 1; }),
-        new((a, _) => { Speak("Copper pipes?"); _rix = 2; })
+        UncertainBool.Of((a, _) => { Speak("Gold knobs?"); _rix = 0; }),
+        UncertainBool.Of((a, _) => { Speak("Steel faucet?"); _rix = 1; }),
+        UncertainBool.Of((a, _) => { Speak("Copper pipes?"); _rix = 2; })
     ];
     private UncertainBool[] Rules { get => field ??= DefaultRules; set; }
 
@@ -28,7 +28,7 @@ public partial class Sink : RoboExpertModule
 
     public override void Select()
     {
-        var row = new UncertainCondition<(int[], bool)>(Edgework.Batteries < 2, ([2, 1, 4], true))
+        var row = UncertainCondition<(int[], bool)>.Of(Edgework.Batteries < 2, ([2, 1, 4], true))
             | (Edgework.Batteries > 1 & Edgework.Batteries < 4, ([3, 6, 2], false))
             | (Edgework.Batteries > 3 & Edgework.Batteries < 6, ([5, 3, 1], false))
             | ([5, 6, 4], true);

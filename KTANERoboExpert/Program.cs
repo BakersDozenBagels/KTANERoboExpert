@@ -658,9 +658,9 @@ internal static partial class Program
     internal static Edgework UnspecifiedEdgework
     {
         get => new(
-            new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.SerialNumber, a, b)),
-            new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Batteries, a, b)),
-            new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Batteries, a, b)),
+            Uncertain<string>.Of((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.SerialNumber, a, b)),
+            UncertainInt.Unknown((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Batteries, a, b)),
+            UncertainInt.Unknown((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Batteries, a, b)),
             UncertainEnumerable<Indicator>.Of((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Indicators, a, b)),
             UncertainEnumerable<PortPlate>.Of((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Ports, a, b)),
             0,

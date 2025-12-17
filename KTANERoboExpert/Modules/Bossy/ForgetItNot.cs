@@ -23,7 +23,7 @@ public partial class ForgetItNot : RoboExpertModule
     {
         if (_submenu.Exists)
         {
-            _stages[_submenu.Item].SparseSet(Edgework.Solves.Min!, int.Parse(command), () => new(AskStage));
+            _stages[_submenu.Item].SparseSet(Edgework.Solves.Min!, int.Parse(command), () => UncertainInt.Unknown(AskStage));
             if (_submenu.Item == _stages.Count - 1)
             {
                 _submenu = new();
@@ -73,7 +73,7 @@ public partial class ForgetItNot : RoboExpertModule
 
             _stages.SparseExpand(ix, () => []);
 
-            _stages[ix - 1].SparseSet(stage - 1, digit, () => new(AskStage));
+            _stages[ix - 1].SparseSet(stage - 1, digit, () => UncertainInt.Unknown(AskStage));
             Speak("Stage " + stage + " is " + digit);
             ExitSubmenu();
         }
