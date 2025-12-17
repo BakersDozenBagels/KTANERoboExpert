@@ -6,6 +6,7 @@ using System.Speech.Synthesis;
 using System.Text.RegularExpressions;
 using KTANERoboExpert;
 using KTANERoboExpert.Uncertain;
+using static KTANERoboExpert.Edgework;
 
 internal static partial class Program
 {
@@ -571,14 +572,14 @@ internal static partial class Program
         else if (_edgeworkQuery == RoboExpertModule.EdgeworkType.Indicators || (_edgeworkQuery == null && (IndicatorsRegex().IsMatch(command) || NoIndicatorsRegex().IsMatch(command))))
         {
             if (NoIndicatorsRegex().IsMatch(command))
-                _edgework = _edgework with { Indicators = new([]) };
+                _edgework = _edgework with { _indicators = UncertainEnumerable<Indicator>.Of([]) };
             else
             {
                 _edgework = _edgework with
                 {
-                    Indicators = new([..IndicatorsRegex()
+                    _indicators = UncertainEnumerable<Indicator>.Of([..IndicatorsRegex()
                     .Matches(command)
-                    .Select(m => new Edgework.Indicator(m.Groups[2].Value.Replace(" ", "").ToUpperInvariant() is var ind && ind == "MIKESA" ? "MSA" : ind == "NOVEMBERSA" ? "NSA" : ind, m.Groups[1].Value == "lit"))])
+                    .Select(m => new Indicator(m.Groups[2].Value.Replace(" ", "").ToUpperInvariant() is var ind && ind == "MIKESA" ? "MSA" : ind == "NOVEMBERSA" ? "NSA" : ind, m.Groups[1].Value == "lit"))])
                 };
             }
 
@@ -590,12 +591,12 @@ internal static partial class Program
                 command = command[6..];
             if (command == "none")
             {
-                _edgework = _edgework with { _ports = new([]) };
+                _edgework = _edgework with { _ports = UncertainEnumerable<PortPlate>.Of([]) };
                 Speak("0 port plates");
             }
             else
             {
-                static Maybe<Edgework.PortPlate> Parse(string parts)
+                static Maybe<PortPlate> Parse(string parts)
                 {
                     var ports = parts.Split(' ');
                     if (ports.Length != ports.Distinct().Count())
@@ -612,7 +613,7 @@ internal static partial class Program
                     .ToArray();
                 if (plates.Any(p => !p.Exists))
                     return;
-                _edgework = _edgework with { _ports = new([.. plates.Select(x => x.Item)]) };
+                _edgework = _edgework with { _ports = UncertainEnumerable<PortPlate>.Of([.. plates.Select(x => x.Item)]) };
                 Speak(plates.Length + " port plate" + (plates.Length > 1 ? "s" : ""));
             }
         }
@@ -660,8 +661,8 @@ internal static partial class Program
             new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.SerialNumber, a, b)),
             new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Batteries, a, b)),
             new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Batteries, a, b)),
-            new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Indicators, a, b)),
-            new((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Ports, a, b)),
+            UncertainEnumerable<Indicator>.Of((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Indicators, a, b)),
+            UncertainEnumerable<PortPlate>.Of((a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Ports, a, b)),
             0,
             UncertainInt.InRange(0, 0, (a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.Solves, a, b)),
             UncertainInt.AtLeast(0, (a, b) => _onRequestEdgeworkFill(RoboExpertModule.EdgeworkType.ModuleCount, a, b)),

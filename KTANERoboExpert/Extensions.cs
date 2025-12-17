@@ -1,6 +1,7 @@
 ﻿using KTANERoboExpert.Uncertain;
 using System.Runtime.CompilerServices;
 using System.Text;
+using static KTANERoboExpert.Edgework;
 
 namespace KTANERoboExpert;
 
@@ -103,7 +104,7 @@ internal static class Extensions
     /// Gets the letters in the serial number.
     /// </summary>
     public static UncertainEnumerable<char> SerialNumberLetters(this Edgework edgework) =>
-        edgework.SerialNumber.Map(s => new UncertainEnumerable<char>(s.Where(c => !"0123456789".Contains(c)))).OrElse(new(edgework.SerialNumber.Fill, 2, 4));
+        edgework.SerialNumber.Map(s => UncertainEnumerable<char>.Of(s.Where(c => !"0123456789".Contains(c)))).OrElse(UncertainEnumerable<char>.Of(edgework.SerialNumber.Fill, 2, 4));
     /// <summary>
     /// Gets the vowels in the serial number. This does not include Y.
     /// </summary>
@@ -118,7 +119,7 @@ internal static class Extensions
     /// Gets the numeric digits in the serial number.
     /// </summary>
     public static UncertainEnumerable<int> SerialNumberDigits(this Edgework edgework) =>
-        edgework.SerialNumber.Map(s => new UncertainEnumerable<int>(s.Where("0123456789".Contains).Select(c => int.Parse(c.ToString())))).OrElse(new(edgework.SerialNumber.Fill, 2, 4));
+        edgework.SerialNumber.Map(s => UncertainEnumerable<int>.Of(s.Where("0123456789".Contains).Select(c => int.Parse(c.ToString())))).OrElse(UncertainEnumerable<int>.Of(edgework.SerialNumber.Fill, 2, 4));
     /// <summary>
     /// Tests whether the bomb has an indicator with the given properties.
     /// </summary>
@@ -131,5 +132,8 @@ internal static class Extensions
 
     public static UncertainInt AsUncertainInt(this IUncertain<int> i, Maybe<int> min = default, Maybe<int> max = default) =>
         i.IsCertain ? i.Value : UncertainInt.InRange(min, max, i.Fill);
+    public static UncertainBool AsUncertainBool(this IUncertain i) =>
+        i.IsCertain ? true : new UncertainBool(i.Fill);
+
     public static UncertainInt Coalesce(this UncertainInt u, UncertainInt other) => u.IsCertain ? u : UncertainInt.InRange(other.Min, other.Max, u.Fill);
 }

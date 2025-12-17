@@ -6,11 +6,19 @@ public class UncertainEnumerable<T> : Uncertain<IEnumerable<T>>, IEnumerable<T>
 {
     private readonly Maybe<int> _minLength = new(), _maxLength = new();
 
-    public UncertainEnumerable(IEnumerable<T> value) : base(value) { }
-    public UncertainEnumerable(Action<Action, Action?> fill, Maybe<int> minLength = default, Maybe<int> maxLength = default) : base(fill)
+    private UncertainEnumerable(IEnumerable<T> value) : base(value) { }
+    private UncertainEnumerable(Action<Action, Action?> fill, Maybe<int> minLength = default, Maybe<int> maxLength = default) : base(fill)
     {
         _minLength = minLength;
         _maxLength = maxLength;
+    }
+
+    public static UncertainEnumerable<T> Of(IEnumerable<T> value) => new(value);
+    public static UncertainEnumerable<T> Of(Action<Action, Action?> fill, Maybe<int> minLength = default, Maybe<int> maxLength = default)
+    {
+        if (minLength.Exists && maxLength.Exists && minLength.Item == maxLength.Item)
+            return new([]);
+        return new(fill, minLength, maxLength);
     }
 
     public UncertainInt Count => IsCertain ? Value.Count() : OfRange();
@@ -30,8 +38,8 @@ public class UncertainEnumerable<T> : Uncertain<IEnumerable<T>>, IEnumerable<T>
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Value!).GetEnumerator();
 
     public UncertainEnumerable<T> Where(Func<T, bool> predicate) => Where((e, i) => predicate(e));
-    public UncertainEnumerable<T> Where(Func<T, int, bool> predicate) => IsCertain ? new(Value.Where(predicate)) : new UncertainEnumerable<T>(_getValue.Item!, 0, _maxLength);
+    public UncertainEnumerable<T> Where(Func<T, int, bool> predicate) => IsCertain ? Of(Value.Where(predicate)) : Of(_getValue.Item!, 0, _maxLength);
 
     public UncertainEnumerable<U> Select<U>(Func<T, U> selector) => Select((e, i) => selector(e));
-    public UncertainEnumerable<U> Select<U>(Func<T, int, U> selector) => IsCertain ? new(Value.Select(selector)) : new UncertainEnumerable<U>(_getValue.Item!, _minLength, _maxLength);
+    public UncertainEnumerable<U> Select<U>(Func<T, int, U> selector) => IsCertain ? UncertainEnumerable<U>.Of(Value.Select(selector)) : UncertainEnumerable<U>.Of(_getValue.Item!, _minLength, _maxLength);
 }
