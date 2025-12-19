@@ -127,6 +127,8 @@ internal static class Extensions
         edgework.Indicators.IsCertain
             ? UncertainBool.Of(edgework.Indicators.Value.Any(i => (!label.Exists || i.Label == label.Item) && (!lit.Exists || i.Lit == lit.Item)))
             : UncertainBool.Of(edgework.Indicators.Fill);
+    public static UncertainBool HasAnyIndicator(this Edgework edgework, params IEnumerable<string> labels) =>
+        labels.Select(l => edgework.HasIndicator(l)).Aggregate((a, b) => a | b);
 
     public static UncertainInt AsUncertainInt(this IUncertain<int> i, Maybe<int> min = default, Maybe<int> max = default) =>
         i.IsCertain ? i.Value : UncertainInt.InRange(min, max, i.Fill);

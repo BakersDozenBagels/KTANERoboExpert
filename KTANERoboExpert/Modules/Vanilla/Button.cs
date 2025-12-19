@@ -2,7 +2,7 @@
 using System.Speech.Recognition;
 using System.Text.RegularExpressions;
 
-namespace KTANERoboExpert.Modules;
+namespace KTANERoboExpert.Modules.Vanilla;
 
 public partial class Button : RoboExpertModule
 {
