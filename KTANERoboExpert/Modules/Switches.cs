@@ -1,7 +1,4 @@
-﻿using KTANERoboExpert.Uncertain;
-using System.Diagnostics;
-using System.Speech.Recognition;
-using System.Xml.Linq;
+﻿using System.Speech.Recognition;
 
 namespace KTANERoboExpert.Modules;
 

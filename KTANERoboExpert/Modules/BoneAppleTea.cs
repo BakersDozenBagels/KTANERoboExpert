@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using System.Speech.Recognition;
+﻿using System.Speech.Recognition;
 
 namespace KTANERoboExpert.Modules;
 
