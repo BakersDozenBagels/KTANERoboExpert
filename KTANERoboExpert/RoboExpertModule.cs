@@ -78,6 +78,10 @@ public abstract class RoboExpertModule
     /// The numbers 0 to 101.
     /// </summary>
     protected internal static readonly IReadOnlyCollection<string> Numbers = [.. Enumerable.Range(0, 102).Select(x => x.ToString())];
+    /// <summary>
+    /// The numbers 0 to 1000.
+    /// </summary>
+    protected internal static readonly IReadOnlyCollection<string> BigNumbers = [.. Enumerable.Range(0, 1001).Select(x => x.ToString())];
 
     /// <summary>
     /// The name of the module this class solves.
