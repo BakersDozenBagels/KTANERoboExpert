@@ -26,7 +26,7 @@ public class Backgrounds : RoboExpertModule
             | ((button == 0 || button == 2 || button == 4) && (bg == 0 || bg == 2 || bg == 4), 4)
             | (button == 1 || button == 3 || button == 5, 5)
             | (Edgework.HasIndicator("SND", lit: false), 6)
-            | (Edgework.Ports.Where(pl => pl.Serial).Count > 0, 7)
+            | (Edgework.PortPlates.Where(pl => pl.Serial).Count > 0, 7)
             | ((bg == 4 && button == 4) || ((bg == 2 || bg == 3) && button == 3) || ((bg == 0 || bg == 5) && button == 5), 8)
             | 9;
 
@@ -44,7 +44,7 @@ public class Backgrounds : RoboExpertModule
             | (row != 4 && (button == 0 || button == 2 || button == 4) && (bg == 0 || bg == 2 || bg == 4), 5)
             | (row != 5 && (button == 1 || button == 3 || button == 5), 4)
             | (row != 6 & Edgework.HasIndicator("SND", lit: false), 1)
-            | (row != 7 & Edgework.Ports.Where(pl => pl.Serial).Count > 0, 2)
+            | (row != 7 & Edgework.PortPlates.Where(pl => pl.Serial).Count > 0, 2)
             | (row != 8 && ((bg == 4 && button == 4) || ((bg == 2 || bg == 3) && button == 3) || ((bg == 0 || bg == 5) && button == 5)), 3)
             | 0;
 

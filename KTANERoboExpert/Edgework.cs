@@ -40,15 +40,16 @@ public record Edgework(
     internal UncertainEnumerable<Indicator> _indicators { get; init; } = Indicators;
     public UncertainEnumerable<Indicator> Indicators { get => _indicators.IsCertain ? _indicators : UncertainEnumerable<Indicator>.Of(_indicators.Fill, 0, IndicatorCount.Max); }
     private UncertainInt _indicatorCount => _indicators.Count.Coalesce(UncertainInt.AtLeast(0, Indicators.Fill).ButAtMost(WidgetCount));
-    public UncertainInt IndicatorCount => _indicators.Count.Coalesce(WidgetCount - (_batteryHolders + _portPlateCount).ButAtMost(WidgetCount));
+    private UncertainInt IndicatorCount => _indicators.Count.Coalesce(WidgetCount - (_batteryHolders + _portPlateCount).ButAtMost(WidgetCount));
 
     internal UncertainEnumerable<PortPlate> _ports { get; init; } = Ports;
-    public UncertainEnumerable<PortPlate> Ports { get => _ports.IsCertain ? _ports : UncertainEnumerable<PortPlate>.Of(_ports.Fill, 0, PortPlateCount.Max); }
+    public UncertainEnumerable<PortPlate> PortPlates { get => _ports.IsCertain ? _ports : UncertainEnumerable<PortPlate>.Of(_ports.Fill, 0, PortPlateCount.Max); }
 
     private UncertainInt _portPlateCount => _ports.Count.Coalesce(UncertainInt.AtLeast(0, _ports.Fill).ButAtMost(WidgetCount));
-    public UncertainInt PortPlateCount => _ports.Count.Coalesce(WidgetCount - (_batteryHolders + _indicatorCount).ButAtMost(WidgetCount));
+    private UncertainInt PortPlateCount => _ports.Count.Coalesce(WidgetCount - (_batteryHolders + _indicatorCount).ButAtMost(WidgetCount));
 
-    public UncertainInt PortCount => Ports.Map(pl => pl.Sum(CountPlate)).AsUncertainInt().Coalesce(PortPlateCount * UncertainInt.InRange(0, 4, Ports.Fill));
+    public UncertainInt PortCount => PortPlates.Map(pl => pl.Sum(CountPlate)).AsUncertainInt().Coalesce(PortPlateCount * UncertainInt.InRange(0, 4, PortPlates.Fill));
+    public UncertainEnumerable<PortType> PortTypes => UncertainEnumerable<PortType>.Of(Enum.GetValues<PortType>()).Where(p => PortPlates.Count(l => l.HasPort(p)) > 0);
 
     public UncertainInt AABatteries => (2 * (Batteries - BatteryHolders)).ButWithinRange(0, Batteries);
     public UncertainInt DBatteries => (2 * BatteryHolders - Batteries).ButWithinRange(0, Batteries);
@@ -81,5 +82,25 @@ public record Edgework(
     /// <param name="RJ45"><see langword="true"/> if the port plate has a RJ-45 port, <see langword="false"/> otherwise.</param>
     /// <param name="Serial"><see langword="true"/> if the port plate has a serial port, <see langword="false"/> otherwise.</param>
     /// <param name="StereoRCA"><see langword="true"/> if the port plate has a stereo RCA port, <see langword="false"/> otherwise.</param>
-    public record struct PortPlate(bool DVID, bool Parallel, bool PS2, bool RJ45, bool Serial, bool StereoRCA);
+    public record struct PortPlate(bool DVID, bool Parallel, bool PS2, bool RJ45, bool Serial, bool StereoRCA)
+    {
+        public readonly bool HasPort(PortType p)
+        {
+            return p switch
+            {
+                PortType.DVID => DVID,
+                PortType.Parallel => Parallel,
+                PortType.PS2 => PS2,
+                PortType.RJ45 => RJ45,
+                PortType.Serial => Serial,
+                PortType.StereoRCA => StereoRCA,
+                _ => throw new ArgumentException("Illegal port type", nameof(p))
+            };
+        }
+    }
+
+    public enum PortType
+    {
+        DVID, Parallel, PS2, RJ45, Serial, StereoRCA
+    }
 }

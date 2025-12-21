@@ -168,8 +168,8 @@ public partial class ForgetAnyColor : RoboExpertModule
         var exclude = gear switch
         {
             "red" => Edgework.Batteries,
-            "orange" => Edgework.IndicatorCount,
-            "yellow" => Edgework.PortPlateCount,
+            "orange" => Edgework.Indicators.Count,
+            "yellow" => Edgework.PortPlates.Count,
             "green" => Edgework.SerialNumberDigits().Map(d => d.First()),
             "cyan" => Edgework.BatteryHolders,
             "blue" => Edgework.Indicators.Where(i => !i.Lit).Count,

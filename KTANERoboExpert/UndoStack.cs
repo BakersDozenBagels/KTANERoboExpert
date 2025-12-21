@@ -7,7 +7,7 @@ namespace KTANERoboExpert;
 /// </summary>
 /// <typeparam name="T">The type of state to store</typeparam>
 /// <param name="baseState">The default state when no user input has been given</param>
-public sealed class UndoStack<T>(T baseState)
+public sealed class UndoStack<T>(T baseState) where T : notnull
 {
     private int _pointer;
     private readonly List<HistoryNode> _history = [new(baseState, true)];

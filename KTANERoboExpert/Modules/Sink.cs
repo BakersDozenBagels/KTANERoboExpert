@@ -44,7 +44,7 @@ public class Sink : RoboExpertModule
             Edgework.HasIndicator("NSA", lit: false),
             Edgework.SerialNumberVowels().Count != 0,
             ..Rules,
-            Edgework.Ports.Where(pl => pl.RJ45).Count != 0
+            Edgework.PortPlates.Where(pl => pl.RJ45).Count != 0
         ];
 
         var total = row.Value.Item1.Select(i => conds[i - 1].AsUncertainBool()).Aggregate((a, b) => a & b);

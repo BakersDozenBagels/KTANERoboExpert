@@ -221,7 +221,7 @@ internal static partial class Program
                 RoboExpertModule.EdgeworkType.SerialNumber => _edgework.SerialNumber as IUncertain,
                 RoboExpertModule.EdgeworkType.Batteries => _edgework.Batteries,
                 RoboExpertModule.EdgeworkType.Indicators => _edgework.Indicators,
-                RoboExpertModule.EdgeworkType.Ports => _edgework.Ports,
+                RoboExpertModule.EdgeworkType.Ports => _edgework.PortPlates,
                 RoboExpertModule.EdgeworkType.Solves => _edgework.Solves,
                 RoboExpertModule.EdgeworkType.ModuleCount => _edgework.ModuleCount,
                 _ => throw new ArgumentException("Bad edgework type", nameof(type)),
@@ -244,8 +244,8 @@ internal static partial class Program
                     RoboExpertModule.EdgeworkType.Batteries => batteries,
                     RoboExpertModule.EdgeworkType.Indicators => indicators,
                     RoboExpertModule.EdgeworkType.Ports => portsGrammar,
-                    RoboExpertModule.EdgeworkType.Solves => modules,
-                    RoboExpertModule.EdgeworkType.ModuleCount => solves,
+                    RoboExpertModule.EdgeworkType.Solves => solves,
+                    RoboExpertModule.EdgeworkType.ModuleCount => modules,
                     _ => throw new ArgumentException("Bad edgework type", nameof(type)),
                 };
                 _edgeworkQuery = type;

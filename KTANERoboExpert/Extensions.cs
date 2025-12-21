@@ -1,4 +1,5 @@
 ﻿using KTANERoboExpert.Uncertain;
+using System.Linq;
 using System.Text;
 
 namespace KTANERoboExpert;
@@ -94,9 +95,13 @@ internal static class Extensions
     public static UncertainBool Matches<T>(this IUncertain<T> u, Func<T, UncertainBool> predicate) =>
         u.IsCertain ? predicate(u.Value!) : UncertainBool.Of(u.Fill);
 
-    public static IUncertain<U> Map<T, U>(this IUncertain<T> u, Func<T, U> map) => u.IsCertain ? map(u.Value!) : Uncertain<U>.Of(u.Fill);
-    public static IUncertain<U> FlatMap<T, U>(this IUncertain<T> u, Func<T, IUncertain<U>> map) => u.IsCertain ? map(u.Value!) : Uncertain<U>.Of(u.Fill);
+    public static IUncertain<U> Map<T, U>(this IUncertain<T> u, Func<T, U> map) where U : notnull => u.IsCertain ? map(u.Value!) : Uncertain<U>.Of(u.Fill);
+    public static IUncertain<U> FlatMap<T, U>(this IUncertain<T> u, Func<T, IUncertain<U>> map) where U : notnull => u.IsCertain ? map(u.Value!) : Uncertain<U>.Of(u.Fill);
     public static T OrElse<T>(this IUncertain<T> u, T value) => u.IsCertain ? u.Value! : value;
+    public static T OrElse<T>(this IUncertain<T> u, Func<T> value) => u.IsCertain ? u.Value! : value();
+
+    public static U Match<T, U>(this IUncertain<T> u, Func<T, U> map, Func<U> orElse) where U : notnull => u.Map(map).OrElse(orElse);
+    public static U Match<T, U>(this IUncertain<T> u, Func<T, U> map, U orElse) where U : notnull => u.Map(map).OrElse(orElse);
 
     /// <summary>
     /// Gets the letters in the serial number.
@@ -136,4 +141,20 @@ internal static class Extensions
         i.IsCertain ? true : UncertainBool.Of(i.Fill);
 
     public static UncertainInt Coalesce(this UncertainInt u, UncertainInt other) => u.IsCertain ? u : UncertainInt.InRange(other.Min, other.Max, u.Fill);
+
+    public static UncertainEnumerable<T> Where<T>(this IEnumerable<T> en, Func<T, IUncertain<bool>> predicate) where T : notnull => en.Where((e, i) => predicate(e));
+    public static UncertainEnumerable<T> Where<T>(this IEnumerable<T> en, Func<T, int, IUncertain<bool>> predicate) where T : notnull
+    {
+        if (en.Select((e, i) => predicate(e, i).IsCertain).All(x => x))
+            return UncertainEnumerable<T>.Of(en.Where((e, i) => predicate(e, i).Value!));
+
+        var counts = en.Select((e, i) => predicate(e, i) switch { { IsCertain: true, Value: true } => (1, 1), { IsCertain: true, Value: false } => (0, 0), { IsCertain: false } => (0, 1) }).Aggregate((a, b) => (a.Item1 + b.Item1, a.Item2 + b.Item2));
+
+        return UncertainEnumerable<T>.Of(en.Select((e, i) => (predicate(e, i))).First(t => !t.IsCertain).Fill, counts.Item1, counts.Item2);
+    }
+
+    public static UncertainInt Count<T>(this UncertainEnumerable<T> en, Func<T, bool> predicate) where T : notnull => en.Where(predicate).Count;
+    public static UncertainInt Count<T>(this UncertainEnumerable<T> en, Func<T, int, bool> predicate) where T : notnull => en.Where(predicate).Count;
+    public static UncertainInt Count<T>(this UncertainEnumerable<T> en, Func<T, IUncertain<bool>> predicate) where T : notnull => en.Where(predicate).Count;
+    public static UncertainInt Count<T>(this UncertainEnumerable<T> en, Func<T, int, IUncertain<bool>> predicate) where T : notnull => en.Where(predicate).Count;
 }

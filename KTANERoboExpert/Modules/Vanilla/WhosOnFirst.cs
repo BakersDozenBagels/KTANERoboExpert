@@ -70,7 +70,6 @@ public class WhosOnFirst : RoboExpertModule
         ["L E E D"] = "LEED",
         ["HOLD ON"] = "HOLD ON",
         ["H O L D O N"] = "HOLD ON",
-        ["Y O U"] = "YOU",
         ["YOU WORD"] = "YOU",
         ["WORD YOU"] = "YOU",
         ["Y O U"] = "YOU",

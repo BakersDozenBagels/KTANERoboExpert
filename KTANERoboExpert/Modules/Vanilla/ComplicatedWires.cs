@@ -29,8 +29,8 @@ public class ComplicatedWires : RoboExpertModule
             Edgework.SerialNumber.Fill(() => RunCommands(commands));
         else if (commands.Contains(Command.Batteries) && !Edgework.Batteries.IsCertain)
             Edgework.Batteries.Fill(() => RunCommands(commands));
-        else if (commands.Contains(Command.Parallel) && !Edgework.Ports.IsCertain)
-            Edgework.Ports.Fill(() => RunCommands(commands));
+        else if (commands.Contains(Command.Parallel) && !Edgework.PortPlates.IsCertain)
+            Edgework.PortPlates.Fill(() => RunCommands(commands));
         else
         {
             Speak(commands.Select(c => c switch
@@ -39,7 +39,7 @@ public class ComplicatedWires : RoboExpertModule
                 Command.Skip => false,
                 Command.SerialNumber => Edgework.SerialNumberDigits().Last() % 2 == 0,
                 Command.Batteries => Edgework.Batteries.Value! >= 2,
-                Command.Parallel => Edgework.Ports.Value!.Any(p => p.Parallel),
+                Command.Parallel => Edgework.PortPlates.Value!.Any(p => p.Parallel),
                 _ => throw new UnreachableException(),
             }).Select(b => b ? "cut" : "skip").Conjoin());
             ExitSubmenu();

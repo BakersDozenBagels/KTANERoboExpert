@@ -3,7 +3,7 @@
 namespace KTANERoboExpert.Uncertain
 {
     /// <inheritdoc cref="IUncertain{T}"/>
-    public class Uncertain<T> : IUncertain<T>
+    public class Uncertain<T> : IUncertain<T> where T : notnull
     {
         private readonly Maybe<T> _value;
         protected readonly Maybe<Action<Action, Action?>> _getValue;
