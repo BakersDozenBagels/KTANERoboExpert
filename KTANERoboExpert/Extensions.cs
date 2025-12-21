@@ -86,4 +86,15 @@ internal static class Extensions
         else
             l.Add(value);
     }
+
+    public static IEnumerable<int> AllIndicesOf<T>(this T[] en, T item)
+    {
+        int ix = 0;
+        ix = Array.IndexOf(en, item, ix);
+        while (ix is not -1)
+        {
+            yield return ix;
+            ix = Array.IndexOf(en, item, ix + 1);
+        }
+    }
 }

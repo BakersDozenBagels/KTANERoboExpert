@@ -2,7 +2,7 @@
 
 public static class UncertainExtensions
 {
-    /// <summary>Maps this value to value if it is certain, or propogates uncertainty otherwise.</summary>
+    /// <summary>Maps this value to a new one if it is certain, or propogates uncertainty otherwise.</summary>
     public static IUncertain<U> Map<T, U>(this IUncertain<T> u, Func<T, U> map) where U : notnull => u.IsCertain ? map(u.Value!) : Uncertain<U>.Of(u.Fill);
     /// <summary>Maps this value to an uncertain value if it is certain, or propogates uncertainty otherwise.</summary>
     public static IUncertain<U> FlatMap<T, U>(this IUncertain<T> u, Func<T, IUncertain<U>> map) where U : notnull => u.IsCertain ? map(u.Value!) : Uncertain<U>.Of(u.Fill);
@@ -47,9 +47,9 @@ public static class UncertainExtensions
     public static UncertainInt Into(this IUncertain<int> i, Maybe<int> min = default, Maybe<int> max = default) =>
         i.IsCertain ? i.Value : UncertainInt.InRange(min, max, i.Fill);
     /// <summary>Upcasts this value.</summary>
-    public static UncertainBool Into(this IUncertain<bool> b) => b.IsCertain? UncertainBool.Of(b.Value) : UncertainBool.Of(b.Fill);
+    public static UncertainBool Into(this IUncertain<bool> b) => b.IsCertain ? UncertainBool.Of(b.Value) : UncertainBool.Of(b.Fill);
     /// <summary>Upcasts this value.</summary>
-    public static UncertainEnumerable<T> Into<T>(this IUncertain<IEnumerable<T>> b) where T : notnull => b.IsCertain? UncertainEnumerable<T>.Of(b.Value!) : UncertainEnumerable<T>.Of(b.Fill);
+    public static UncertainEnumerable<T> Into<T>(this IUncertain<IEnumerable<T>> b) where T : notnull => b.IsCertain ? UncertainEnumerable<T>.Of(b.Value!) : UncertainEnumerable<T>.Of(b.Fill);
 
     /// <summary>Collapses two ranges into one.</summary>
     public static UncertainInt Coalesce(this UncertainInt u, UncertainInt other) => u.ButWithinRange(other.Min, other.Max);
@@ -77,4 +77,12 @@ public static class UncertainExtensions
     public static UncertainInt Count<T>(this UncertainEnumerable<T> en, Func<T, IUncertain<bool>> predicate) where T : notnull => en.Where(predicate).Count;
     /// <summary>Counts the number of items potentially in this sequence that potentially match a given criterion.</summary>
     public static UncertainInt Count<T>(this UncertainEnumerable<T> en, Func<T, int, IUncertain<bool>> predicate) where T : notnull => en.Where(predicate).Count;
+
+    /// <summary>Tests whether this sequence contains a given item.</summary>
+    public static UncertainBool Contains<T>(this UncertainEnumerable<T> en, T item) where T : notnull => en.Count(x => EqualityComparer<T>.Default.Equals(x, item)) > 0;
+
+    /// <summary>Tests if this number is odd.</summary>
+    public static UncertainBool IsOdd(this IUncertain<int> u) => u.Map(v => v % 2 is 1).Into();
+    /// <summary>Tests if this number is even.</summary>
+    public static UncertainBool IsEven(this IUncertain<int> u) => u.Map(v => v % 2 is 0).Into();
 }

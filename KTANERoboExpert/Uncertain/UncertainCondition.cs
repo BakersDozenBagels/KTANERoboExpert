@@ -78,5 +78,8 @@ namespace KTANERoboExpert.Uncertain
         public static UncertainCondition<T> operator |(UncertainCondition<T> a, T b) => a.OrElse(b);
         /// <inheritdoc cref="UncertainCondition{T}.UncertainCondition(UncertainBool, T)"/>
         public static implicit operator UncertainCondition<T>((UncertainBool key, T value) tup) => Of(tup.key, tup.value);
+
+        /// <summary>Maps each possible value to a new one, propogating uncertainty if needed.</summary>
+        public UncertainCondition<U> Map<U>(Func<T, U> mapper) => new([.. _values.Select(t => (t.Item1, mapper(t.Item2)))], Exhaustive);
     }
 }
