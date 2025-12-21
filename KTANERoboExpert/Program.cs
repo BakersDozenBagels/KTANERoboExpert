@@ -561,12 +561,13 @@ internal static partial class Program
         else if (_edgeworkQuery == RoboExpertModule.EdgeworkType.Batteries || (_edgeworkQuery == null && BatteryRegex().IsMatch(command)))
         {
             var match = BatteryRegex().Match(command);
-            _edgework = _edgework with
-            {
-                Batteries = int.Parse(match.Groups[1].Value),
-                _batteryHolders = int.Parse(match.Groups[2].Value)
-            };
+            var b = int.Parse(match.Groups[1].Value);
+            var h = int.Parse(match.Groups[2].Value);
 
+            if (b < h || b > 2 * h)
+                return;
+
+            _edgework = _edgework with { Batteries = b, _batteryHolders = h };
             Speak(_edgework.Batteries.Value + " in " + _edgework.BatteryHolders.Value);
         }
         else if (_edgeworkQuery == RoboExpertModule.EdgeworkType.Indicators || (_edgeworkQuery == null && (IndicatorsRegex().IsMatch(command) || NoIndicatorsRegex().IsMatch(command))))
