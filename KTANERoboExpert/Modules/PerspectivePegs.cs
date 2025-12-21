@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Speech.Recognition;
+using KTANERoboExpert.Uncertain;
 
 namespace KTANERoboExpert.Modules;
 
@@ -107,7 +108,7 @@ public class PerspectivePegs : RoboExpertModule
             return;
         }
 
-        var key = _keys[Edgework.SerialNumberLetters().ToArray() switch
+        var key = _keys[Edgework.SerialNumberLetters().Value!.ToArray() switch
         {
             [var a, var b] => Math.Abs(b - a),
             [var a, var b, _] => Math.Abs(b - a),

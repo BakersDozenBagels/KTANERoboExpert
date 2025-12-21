@@ -1,6 +1,4 @@
-﻿using KTANERoboExpert.Uncertain;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 
 namespace KTANERoboExpert;
 
@@ -88,73 +86,4 @@ internal static class Extensions
         else
             l.Add(value);
     }
-
-    /// <summary>
-    /// Maps this value to value to an <see cref="UncertainBool"/> if it is certain, or propogates uncertainty otherwise.
-    /// </summary>
-    public static UncertainBool Matches<T>(this IUncertain<T> u, Func<T, UncertainBool> predicate) =>
-        u.IsCertain ? predicate(u.Value!) : UncertainBool.Of(u.Fill);
-
-    public static IUncertain<U> Map<T, U>(this IUncertain<T> u, Func<T, U> map) where U : notnull => u.IsCertain ? map(u.Value!) : Uncertain<U>.Of(u.Fill);
-    public static IUncertain<U> FlatMap<T, U>(this IUncertain<T> u, Func<T, IUncertain<U>> map) where U : notnull => u.IsCertain ? map(u.Value!) : Uncertain<U>.Of(u.Fill);
-    public static T OrElse<T>(this IUncertain<T> u, T value) => u.IsCertain ? u.Value! : value;
-    public static T OrElse<T>(this IUncertain<T> u, Func<T> value) => u.IsCertain ? u.Value! : value();
-
-    public static U Match<T, U>(this IUncertain<T> u, Func<T, U> map, Func<U> orElse) where U : notnull => u.Map(map).OrElse(orElse);
-    public static U Match<T, U>(this IUncertain<T> u, Func<T, U> map, U orElse) where U : notnull => u.Map(map).OrElse(orElse);
-
-    /// <summary>
-    /// Gets the letters in the serial number.
-    /// </summary>
-    public static UncertainEnumerable<char> SerialNumberLetters(this Edgework edgework) =>
-        edgework.SerialNumber.Map(s => UncertainEnumerable<char>.Of(s.Where(c => !"0123456789".Contains(c)))).OrElse(UncertainEnumerable<char>.Of(edgework.SerialNumber.Fill, 2, 4));
-    /// <summary>
-    /// Gets the vowels in the serial number. This does not include Y.
-    /// </summary>
-    public static UncertainEnumerable<char> SerialNumberVowels(this Edgework edgework) =>
-        edgework.SerialNumberLetters().Where("AEIOU".Contains);
-    /// <summary>
-    /// Gets the consonants in the serial number. This does include Y.
-    /// </summary>
-    public static UncertainEnumerable<char> SerialNumberConsonants(this Edgework edgework) =>
-        edgework.SerialNumberLetters().Where(c => !"AEIOU".Contains(c));
-    /// <summary>
-    /// Gets the numeric digits in the serial number.
-    /// </summary>
-    public static UncertainEnumerable<int> SerialNumberDigits(this Edgework edgework) =>
-        edgework.SerialNumber.Map(s => UncertainEnumerable<int>.Of(s.Where("0123456789".Contains).Select(c => int.Parse(c.ToString())))).OrElse(UncertainEnumerable<int>.Of(edgework.SerialNumber.Fill, 2, 4));
-    /// <summary>
-    /// Tests whether the bomb has an indicator with the given properties.
-    /// </summary>
-    /// <param name="label">Optionally, the label to check for.</param>
-    /// <param name="lit">Optionally, whether the indicator should be lit or unlit.</param>
-    public static UncertainBool HasIndicator(this Edgework edgework, Maybe<string> label = default, Maybe<bool> lit = default) =>
-        edgework.Indicators.IsCertain
-            ? UncertainBool.Of(edgework.Indicators.Value.Any(i => (!label.Exists || i.Label == label.Item) && (!lit.Exists || i.Lit == lit.Item)))
-            : UncertainBool.Of(edgework.Indicators.Fill);
-    public static UncertainBool HasAnyIndicator(this Edgework edgework, params IEnumerable<string> labels) =>
-        labels.Select(l => edgework.HasIndicator(l)).Aggregate((a, b) => a | b);
-
-    public static UncertainInt AsUncertainInt(this IUncertain<int> i, Maybe<int> min = default, Maybe<int> max = default) =>
-        i.IsCertain ? i.Value : UncertainInt.InRange(min, max, i.Fill);
-    public static UncertainBool AsUncertainBool(this IUncertain i) =>
-        i.IsCertain ? true : UncertainBool.Of(i.Fill);
-
-    public static UncertainInt Coalesce(this UncertainInt u, UncertainInt other) => u.IsCertain ? u : UncertainInt.InRange(other.Min, other.Max, u.Fill);
-
-    public static UncertainEnumerable<T> Where<T>(this IEnumerable<T> en, Func<T, IUncertain<bool>> predicate) where T : notnull => en.Where((e, i) => predicate(e));
-    public static UncertainEnumerable<T> Where<T>(this IEnumerable<T> en, Func<T, int, IUncertain<bool>> predicate) where T : notnull
-    {
-        if (en.Select((e, i) => predicate(e, i).IsCertain).All(x => x))
-            return UncertainEnumerable<T>.Of(en.Where((e, i) => predicate(e, i).Value!));
-
-        var counts = en.Select((e, i) => predicate(e, i) switch { { IsCertain: true, Value: true } => (1, 1), { IsCertain: true, Value: false } => (0, 0), { IsCertain: false } => (0, 1) }).Aggregate((a, b) => (a.Item1 + b.Item1, a.Item2 + b.Item2));
-
-        return UncertainEnumerable<T>.Of(en.Select((e, i) => (predicate(e, i))).First(t => !t.IsCertain).Fill, counts.Item1, counts.Item2);
-    }
-
-    public static UncertainInt Count<T>(this UncertainEnumerable<T> en, Func<T, bool> predicate) where T : notnull => en.Where(predicate).Count;
-    public static UncertainInt Count<T>(this UncertainEnumerable<T> en, Func<T, int, bool> predicate) where T : notnull => en.Where(predicate).Count;
-    public static UncertainInt Count<T>(this UncertainEnumerable<T> en, Func<T, IUncertain<bool>> predicate) where T : notnull => en.Where(predicate).Count;
-    public static UncertainInt Count<T>(this UncertainEnumerable<T> en, Func<T, int, IUncertain<bool>> predicate) where T : notnull => en.Where(predicate).Count;
 }

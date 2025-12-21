@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Speech.Recognition;
+using KTANERoboExpert.Uncertain;
 
 namespace KTANERoboExpert.Modules.Vanilla;
 
@@ -20,7 +21,7 @@ public class SimonSays : RoboExpertModule
 
         string[] names = ["red", "blue", "green", "yellow"];
         int[] table =
-            (Edgework.SerialNumberVowels().Any(), Edgework.Strikes) switch
+            (Edgework.SerialNumberVowels().Value!.Any(), Edgework.Strikes) switch
             {
                 (true, 0) => [1, 0, 3, 2],
                 (true, 1) => [3, 2, 1, 0],

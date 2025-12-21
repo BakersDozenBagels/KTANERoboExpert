@@ -33,12 +33,6 @@ public class Sink : RoboExpertModule
             | (Edgework.Batteries > 3 & Edgework.Batteries < 6, ([5, 3, 1], false))
             | ([5, 6, 4], true);
 
-        if (!row.IsCertain)
-        {
-            row.Fill(Select);
-            return;
-        }
-
         UncertainBool[] conds =
         [
             Edgework.HasIndicator("NSA", lit: false),
@@ -47,10 +41,10 @@ public class Sink : RoboExpertModule
             Edgework.PortPlates.Where(pl => pl.RJ45).Count != 0
         ];
 
-        var total = row.Value.Item1.Select(i => conds[i - 1].AsUncertainBool()).Aggregate((a, b) => a & b);
+        var total = row.FlatMap(v => v.Item1.Select(i => conds[i - 1].IsCertain ? true : conds[i - 1]).Aggregate((a, b) => a & b));
         if (!total.IsCertain)
         {
-            total.Fill(Select);
+            total.Fill(Select, ExitSubmenu);
             return;
         }
 

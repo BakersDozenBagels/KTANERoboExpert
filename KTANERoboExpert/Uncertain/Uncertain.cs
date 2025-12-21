@@ -8,24 +8,22 @@ namespace KTANERoboExpert.Uncertain
         private readonly Maybe<T> _value;
         protected readonly Maybe<Action<Action, Action?>> _getValue;
 
-        /// <summary>
-        /// A definitely known value.
-        /// </summary>
+        /// <summary>A definitely known value.</summary>
         protected Uncertain(T value)
         {
             _value = new(value);
             _getValue = new();
         }
-        /// <summary>
-        /// A definitely unknown value.
-        /// </summary>
+        /// <summary>A definitely unknown value.</summary>
         protected Uncertain(Action<Action, Action?> getValue)
         {
             _value = new();
             _getValue = new(getValue);
         }
 
+        /// <inheritdoc cref="Uncertain{T}"/>
         public static Uncertain<T> Of(T value) => new(value);
+        /// <inheritdoc cref="Uncertain{Action{Action, Action?}}"/>
         public static Uncertain<T> Of(Action<Action, Action?> getValue) => new(getValue);
 
         /// <inheritdoc/>

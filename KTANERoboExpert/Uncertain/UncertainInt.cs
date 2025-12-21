@@ -99,7 +99,7 @@
         }
         public static UncertainBool operator !=(UncertainInt a, UncertainInt b) => !(a == b);
 
-        /// <inheritdoc cref="UncertainInt.UncertainInt(int)"/>
+        /// <inheritdoc cref="Exactly(int)"/>
         public static implicit operator UncertainInt(int value) => Exactly(value);
 
         public static UncertainInt operator -(UncertainInt u) =>
@@ -150,8 +150,11 @@
                 other._max == _max;
         public override int GetHashCode() => HashCode.Combine(_getValue, Value, _min, _max);
 
+        /// <summary>Provides a lower bound for the number to make deductions when the value is uncertain.</summary>
         public UncertainInt ButAtMost(UncertainInt max) => IsCertain ? this : InRange(_getValue.Item!, _min, Math.Min(Max, max.Max));
+        /// <summary>Provides an upper bound for the number to make deductions when the value is uncertain.</summary>
         public UncertainInt ButAtLeast(UncertainInt min) => IsCertain ? this : InRange(_getValue.Item!, Math.Max(Min, min.Min), _max);
+        /// <summary>Provides a lower and upper bound for the number to make deductions when the value is uncertain.</summary>
         public UncertainInt ButWithinRange(UncertainInt min, UncertainInt max) => IsCertain ? this : InRange(_getValue.Item!, Math.Max(Min, min.Min), Math.Min(Max, max.Max));
     }
 }

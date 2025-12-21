@@ -1,4 +1,5 @@
 ﻿using System.Speech.Recognition;
+using KTANERoboExpert.Uncertain;
 
 namespace KTANERoboExpert.Modules.Bossy;
 
@@ -65,7 +66,7 @@ public class DividedSquares : RoboExpertModule
             return;
         }
 
-        HashSet<int> letters = [.. Edgework.SerialNumberLetters().Select(c => c - 'A' + 1)];
+        HashSet<int> letters = [.. Edgework.SerialNumberLetters().Select(c => c - 'A' + 1).Value!];
         int[] result = new int[_division.Item! * _division.Item!];
         for (int r = 0; r < _division.Item!; r++)
         {

@@ -3,26 +3,26 @@ using static KTANERoboExpert.Edgework;
 
 namespace KTANERoboExpert;
 
-/// <summary>
-/// Represents a bomb's edgework. Any null values have not yet been entered by the user.
-/// </summary>
+/// <summary>Represents a bomb's edgework. Any uncertain values have not yet been entered by the user.</summary>
 /// <param name="SerialNumber">The bomb's serial number as a string.</param>
 /// <param name="Batteries">The bomb's battery count.</param>
 /// <param name="BatteryHolders">The bomb's battery holder count.</param>
 /// <param name="Indicators">The bomb's indicators.</param>
-/// <param name="Ports">The bomb's port plates.</param>
+/// <param name="PortPlates">The bomb's port plates.</param>
 /// <param name="Strikes">The number of strikes on the bomb.</param>
 public record Edgework(
     Uncertain<string> SerialNumber,
     UncertainInt Batteries,
     UncertainInt BatteryHolders,
     UncertainEnumerable<Indicator> Indicators,
-    UncertainEnumerable<PortPlate> Ports,
+    UncertainEnumerable<PortPlate> PortPlates,
     int Strikes,
     UncertainInt Solves,
-    UncertainInt ModuleCount,
+    UncertainInt SolvableModuleCount,
+    UncertainInt NeedyModuleCount,
     UncertainInt WidgetCount)
 {
+    /// <summary>The bomb's battery count.</summary>
     public UncertainInt Batteries
     {
         get
@@ -35,26 +35,39 @@ public record Edgework(
     } = Batteries;
 
     internal UncertainInt _batteryHolders { get => field.ButWithinRange(0, WidgetCount); init => field = value; } = BatteryHolders;
+    /// <summary>The bomb's battery holder count.</summary>
     public UncertainInt BatteryHolders => _batteryHolders.Coalesce(WidgetCount - (_indicatorCount + _portPlateCount).ButAtMost(WidgetCount));
 
     internal UncertainEnumerable<Indicator> _indicators { get; init; } = Indicators;
+    /// <summary>The bomb's indicators.</summary>
     public UncertainEnumerable<Indicator> Indicators { get => _indicators.IsCertain ? _indicators : UncertainEnumerable<Indicator>.Of(_indicators.Fill, 0, IndicatorCount.Max); }
     private UncertainInt _indicatorCount => _indicators.Count.Coalesce(UncertainInt.AtLeast(0, Indicators.Fill).ButAtMost(WidgetCount));
     private UncertainInt IndicatorCount => _indicators.Count.Coalesce(WidgetCount - (_batteryHolders + _portPlateCount).ButAtMost(WidgetCount));
 
-    internal UncertainEnumerable<PortPlate> _ports { get; init; } = Ports;
+    internal UncertainEnumerable<PortPlate> _ports { get; init; } = PortPlates;
+    /// <summary>The bomb's port plates.</summary>
     public UncertainEnumerable<PortPlate> PortPlates { get => _ports.IsCertain ? _ports : UncertainEnumerable<PortPlate>.Of(_ports.Fill, 0, PortPlateCount.Max); }
 
     private UncertainInt _portPlateCount => _ports.Count.Coalesce(UncertainInt.AtLeast(0, _ports.Fill).ButAtMost(WidgetCount));
     private UncertainInt PortPlateCount => _ports.Count.Coalesce(WidgetCount - (_batteryHolders + _indicatorCount).ButAtMost(WidgetCount));
 
-    public UncertainInt PortCount => PortPlates.Map(pl => pl.Sum(CountPlate)).AsUncertainInt().Coalesce(PortPlateCount * UncertainInt.InRange(0, 4, PortPlates.Fill));
+    public UncertainInt PortCount => PortPlates.Map(pl => pl.Sum(CountPlate)).Into().Coalesce(PortPlateCount * UncertainInt.InRange(0, 4, PortPlates.Fill));
+    /// <summary>The bomb's distinct ports.</summary>
     public UncertainEnumerable<PortType> PortTypes => UncertainEnumerable<PortType>.Of(Enum.GetValues<PortType>()).Where(p => PortPlates.Count(l => l.HasPort(p)) > 0);
+    /// <summary>The bomb's ports.</summary>
+    public UncertainEnumerable<PortType> Ports =>
+        PortPlates.IsCertain
+            ? UncertainEnumerable<PortType>.Of(PortPlates.Value.SelectMany(l => Enum.GetValues<PortType>().Where(p => l.HasPort(p))))
+            : UncertainEnumerable<PortType>.Of(PortPlates.Fill, 0, Enum.GetValues<PortType>().Length * PortPlates.Count.Max);
 
+    /// <summary>The bomb's AA battery count.</summary>
     public UncertainInt AABatteries => (2 * (Batteries - BatteryHolders)).ButWithinRange(0, Batteries);
+    /// <summary>The bomb's D battery count.</summary>
     public UncertainInt DBatteries => (2 * BatteryHolders - Batteries).ButWithinRange(0, Batteries);
 
-    public static int CountPlate(PortPlate pl)
+    public UncertainInt TotalModuleCount => SolvableModuleCount + NeedyModuleCount;
+
+    private static int CountPlate(PortPlate pl)
     {
         int c = 0;
         if (pl.DVID) c++;
@@ -66,16 +79,12 @@ public record Edgework(
         return c;
     }
 
-    /// <summary>
-    /// Represents an indicator.
-    /// </summary>
+    /// <summary>Represents an indicator.</summary>
     /// <param name="Label">The indicator's label.</param>
     /// <param name="Lit"><see langword="true"/> if the indicator is lit, <see langword="false"/> otherwise.</param>
     public record struct Indicator(string Label, bool Lit);
 
-    /// <summary>
-    /// Represents a port plate.
-    /// </summary>
+    /// <summary>Represents a port plate.</summary>
     /// <param name="DVID"><see langword="true"/> if the port plate has a DVI-D port, <see langword="false"/> otherwise.</param>
     /// <param name="Parallel"><see langword="true"/> if the port plate has a parallel port, <see langword="false"/> otherwise.</param>
     /// <param name="PS2"><see langword="true"/> if the port plate has a PS/2 port, <see langword="false"/> otherwise.</param>
@@ -99,6 +108,7 @@ public record Edgework(
         }
     }
 
+    /// <summary>Represents a type of port.</summary>
     public enum PortType
     {
         DVID, Parallel, PS2, RJ45, Serial, StereoRCA

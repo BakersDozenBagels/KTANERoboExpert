@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Speech.Recognition;
+using KTANERoboExpert.Uncertain;
 
 namespace KTANERoboExpert.Modules;
 
@@ -15,7 +16,7 @@ public class Egg : RoboExpertModule
     public override void Select()
     {
         if (Edgework.SerialNumber.IsCertain)
-            Speak("egg on " + Edgework.SerialNumberDigits().Last());
+            Speak("egg on " + Edgework.SerialNumberDigits().Value!.Last());
         else
             Speak("egg on the last digit of the serial number");
 

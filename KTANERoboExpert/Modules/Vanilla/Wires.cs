@@ -1,6 +1,6 @@
-﻿using KTANERoboExpert.Uncertain;
-using System.Speech.Recognition;
+﻿using System.Speech.Recognition;
 using System.Text.RegularExpressions;
+using KTANERoboExpert.Uncertain;
 
 namespace KTANERoboExpert.Modules;
 
@@ -32,19 +32,19 @@ public partial class Wires : RoboExpertModule
                     | 2;
                 break;
             case 4:
-                result = UncertainCondition<int>.Of(colors.Count(s => s == "red") > 1 & Edgework.SerialNumber.Matches(n => (n[5] - '0') % 2 == 1), Array.LastIndexOf(colors, "red"))
+                result = UncertainCondition<int>.Of(colors.Count(s => s == "red") > 1 & Edgework.SerialNumber.Map(n => (n[5] - '0') % 2 == 1).Into(), Array.LastIndexOf(colors, "red"))
                     | ((colors[3] == "yellow" && !colors.Contains("red")) || colors.Count(s => s == "blue") == 1, 0)
                     | (colors.Count(s => s == "yellow") > 1, 3)
                     | 1;
                 break;
             case 5:
-                result = UncertainCondition<int>.Of(colors[4] == "black" & Edgework.SerialNumber.Matches(n => (n[5] - '0') % 2 == 1), 3)
+                result = UncertainCondition<int>.Of(colors[4] == "black" & Edgework.SerialNumber.Map(n => (n[5] - '0') % 2 == 1).Into(), 3)
                     | (colors.Count(s => s == "red") == 1 && colors.Count(s => s == "yellow") > 1, 0)
                     | (!colors.Contains("black"), 1)
                     | 0;
                 break;
             case 6:
-                result = UncertainCondition<int>.Of(!colors.Contains("yellow") & Edgework.SerialNumber.Matches(n => (n[5] - '0') % 2 == 1), 2)
+                result = UncertainCondition<int>.Of(!colors.Contains("yellow") & Edgework.SerialNumber.Map(n => (n[5] - '0') % 2 == 1).Into(), 2)
                     | (colors.Count(s => s == "yellow") == 1 && colors.Count(s => s == "white") > 1, 3)
                     | (!colors.Contains("red"), 5)
                     | 3;

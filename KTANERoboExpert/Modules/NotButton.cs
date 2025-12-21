@@ -119,10 +119,10 @@ public class NotButton : RoboExpertModule
         UncertainInt
             a = Edgework.Batteries,
             b = Edgework.PortTypes.Count,
-            c = Edgework.ModuleCount,
+            c = Edgework.SolvableModuleCount,
             d = Edgework.Indicators.Count,
-            e = Edgework.SerialNumberDigits()[^1].AsUncertainInt(0, 9),
-            f = Edgework.SerialNumberLetters()[1].Map(c => c - 'A' + 1).AsUncertainInt(1, 26),
+            e = Edgework.SerialNumberDigits()[^1].Into(0, 9),
+            f = Edgework.SerialNumberLetters()[1].Map(c => c - 'A' + 1).Into(1, 26),
             g = label.Length;
 
         UncertainInt amount = color switch

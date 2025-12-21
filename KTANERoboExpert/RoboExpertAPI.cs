@@ -24,6 +24,11 @@ internal static class RoboExpertAPI
     internal static event Action<Action<string?>> OnUnregisterSolveHandler = s => { };
     internal static void UnregisterSolveHandler(Action<string?> handler) => OnUnregisterSolveHandler(handler);
 
+    internal static event Action<Action> OnRegisterStrikeHandler = s => { };
+    internal static void RegisterStrikeHandler(Action handler) => OnRegisterStrikeHandler(handler);
+    internal static event Action<Action> OnUnregisterStrikeHandler = s => { };
+    internal static void UnregisterStrikeHandler(Action handler) => OnUnregisterStrikeHandler(handler);
+
     internal static event Action<Action<Action>> OnInterrupt = c => { };
     internal static void Interrupt(Action<Action> callback) => OnInterrupt(callback);
 

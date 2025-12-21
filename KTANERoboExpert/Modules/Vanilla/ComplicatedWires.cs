@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Speech.Recognition;
+using KTANERoboExpert.Uncertain;
 
 namespace KTANERoboExpert.Modules.Vanilla;
 
@@ -37,7 +38,7 @@ public class ComplicatedWires : RoboExpertModule
             {
                 Command.Cut => true,
                 Command.Skip => false,
-                Command.SerialNumber => Edgework.SerialNumberDigits().Last() % 2 == 0,
+                Command.SerialNumber => Edgework.SerialNumberDigits().Value!.Last() % 2 == 0,
                 Command.Batteries => Edgework.Batteries.Value! >= 2,
                 Command.Parallel => Edgework.PortPlates.Value!.Any(p => p.Parallel),
                 _ => throw new UnreachableException(),

@@ -63,6 +63,10 @@ public abstract class RoboExpertModule
     /// </summary>
     protected static event Action<string?> OnSolve { add => RoboExpertAPI.RegisterSolveHandler(value); remove => RoboExpertAPI.UnregisterSolveHandler(value); }
     /// <summary>
+    /// Use this to (de-)register a handler for when any module, including this one, strikes.
+    /// </summary>
+    protected static event Action OnStrike { add => RoboExpertAPI.RegisterStrikeHandler(value); remove => RoboExpertAPI.UnregisterStrikeHandler(value); }
+    /// <summary>
     /// Gets the bomb's current edgework.
     /// </summary>
     protected static Edgework Edgework => RoboExpertAPI.QueryEdgework();
@@ -119,21 +123,4 @@ public abstract class RoboExpertModule
     /// This should clear any residual state.
     /// </summary>
     public virtual void Reset() { }
-
-    /// <summary>A type of edgework.</summary>
-    protected internal enum EdgeworkType
-    {
-        /// <summary>The bomb's serial number.</summary>
-        SerialNumber,
-        /// <summary>The bomb's battery count and battery holder count.</summary>
-        Batteries,
-        /// <summary>The bomb's indicators.</summary>
-        Indicators,
-        /// <summary>The bomb's ports and ports plates.</summary>
-        Ports,
-        /// <summary>The number of solved modules.</summary>
-        Solves,
-        /// <summary>The total number of modules.</summary>
-        ModuleCount,
-    }
 }
