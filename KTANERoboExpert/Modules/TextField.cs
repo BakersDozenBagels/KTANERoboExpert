@@ -11,9 +11,8 @@ public class TextField : RoboExpertModule
     private Grammar? _grammar;
     public override Grammar Grammar => _grammar ??= new(new GrammarBuilder(new Choices([.. NATO.Take(6)])));
 
-    public override void ProcessCommand(string command)
-    {
-        var check = (command[0] switch
+    public override void ProcessCommand(string command) =>
+        (command[0] switch
         {
             'a' => UncertainCondition<Table>.Of(Edgework.HasIndicator("CLR", lit: true), Table._1459)
                 | (Edgework.Batteries > 2, Table._BBFF)
@@ -46,29 +45,15 @@ public class TextField : RoboExpertModule
                 | (Edgework.SerialNumberDigits()[^1].Into().IsEven(), Table._FB01)
                 | Table._AA12,
             _ => throw new UnreachableException()
-        });
-
-        if (!check.IsCertain)
-        {
-            check.Fill(() => ProcessCommand(command), ExitSubmenu);
-            return;
-        }
-        
-        Speak(_table[check.Value switch
-        {
-            Table._FB01 => 0,
-            Table._965A => 1,
-            Table._1459 => 2,
-            Table._BBFF => 3,
-            Table._DC52 => 4,
-            Table._7F67 => 5,
-            Table._A0C1 => 6,
-            Table._AA12 => 7,
-            _ => throw new UnreachableException()
-        }].AllIndicesOf(command[0]).Select(ToIndex).Conjoin());
-        ExitSubmenu();
-        Solve();
-    }
+        })
+        .Map(v => _table[(int)v].AllIndicesOf(command[0]).Select(ToIndex).Conjoin())
+        .Do(u => u.Fill(() => ProcessCommand(command), ExitSubmenu),
+            v =>
+            {
+                Speak(v);
+                ExitSubmenu();
+                Solve();
+            });
 
     private static string ToIndex(int ix) => NATO.ElementAt(ix % 4) + " " + (ix / 4 + 1);
 
@@ -126,13 +111,13 @@ public class TextField : RoboExpertModule
 
     private enum Table
     {
-        _FB01,
-        _965A,
-        _1459,
-        _BBFF,
-        _DC52,
-        _7F67,
-        _A0C1,
-        _AA12
+        _FB01 = 0,
+        _965A = 1,
+        _1459 = 2,
+        _BBFF = 3,
+        _DC52 = 4,
+        _7F67 = 5,
+        _A0C1 = 6,
+        _AA12 = 7,
     }
 }

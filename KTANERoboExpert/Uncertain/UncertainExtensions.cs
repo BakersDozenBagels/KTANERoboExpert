@@ -16,6 +16,15 @@ public static class UncertainExtensions
     /// <summary>Maps the value if it is certain, or gets a default value provided by a function if it is not.</summary>
     public static U Match<T, U>(this IUncertain<T> u, Func<T, U> map, U orElse) where U : notnull => u.IsCertain ? map(u.Value!) : orElse;
 
+    /// <summary>Unpacks and performs an action depending on the certainty.</summary>
+    public static void Do<T>(this IUncertain<T> u, Action<IUncertain<T>> onUncertain, Action<T> onCertain)
+    {
+        if (u.IsCertain)
+            onCertain(u.Value!);
+        else
+            onUncertain(u);
+    }
+
     /// <summary>Gets the letters in the serial number.</summary>
     public static UncertainEnumerable<char> SerialNumberLetters(this Edgework edgework) =>
         edgework.SerialNumber.Match(
