@@ -47,6 +47,7 @@ public class Keypad : RoboExpertModule
         ["backwards charlie dot"] = 6,
         ["euro"] = 7,
         ["backwards e"] = 7,
+        ["backwards euro"] = 7,
         ["curly cue"] = 8,
         ["loop de loop"] = 8,
         ["cursive q"] = 8,

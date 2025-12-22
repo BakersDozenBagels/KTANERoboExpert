@@ -150,7 +150,7 @@ public partial class SimonStates : RoboExpertModule
             return;
         }
 
-        var order = _table[stage.TopLeft]!;
+        var order = _table[stage.TopLeft]!.ToArray();
         if (low)
             order.Reverse();
 
