@@ -687,6 +687,7 @@ internal static partial class Program
         Solves: UncertainInt.InRange(0, 0, (a, b) => _onRequestEdgeworkFill(EdgeworkType.Solves, a, b)),
         SolvableModuleCount: UncertainInt.AtLeast(0, (a, b) => _onRequestEdgeworkFill(EdgeworkType.SolvableCount, a, b)),
         NeedyModuleCount: UncertainInt.AtLeast(0, (a, b) => _onRequestEdgeworkFill(EdgeworkType.NeedyCount, a, b)),
+        TwoFactorCount: 0,
         WidgetCount: 5);
 
     [GeneratedRegex("(\\d+) batteries (\\d+) holders", RegexOptions.Compiled)]

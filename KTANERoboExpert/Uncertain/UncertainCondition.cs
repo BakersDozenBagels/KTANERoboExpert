@@ -3,7 +3,7 @@
 namespace KTANERoboExpert.Uncertain
 {
     /// <summary>Represents a chain of elseif conditions.</summary>
-    public class UncertainCondition<T> : IUncertain<T>
+    public class UncertainCondition<T> : IUncertain<T> where T : notnull
     {
         private readonly (UncertainBool, T)[] _values;
         /// <summary><see langword="true"/> if this <see cref="UncertainCondition{T}"/> could not have "fallen through" to an undefined case.</summary>
@@ -80,6 +80,6 @@ namespace KTANERoboExpert.Uncertain
         public static implicit operator UncertainCondition<T>((UncertainBool key, T value) tup) => Of(tup.key, tup.value);
 
         /// <summary>Maps each possible value to a new one, propogating uncertainty if needed.</summary>
-        public UncertainCondition<U> Map<U>(Func<T, U> mapper) => new([.. _values.Select(t => (t.Item1, mapper(t.Item2)))], Exhaustive);
+        public UncertainCondition<U> Map<U>(Func<T, U> mapper) where U : notnull => new([.. _values.Select(t => (t.Item1, mapper(t.Item2)))], Exhaustive);
     }
 }

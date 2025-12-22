@@ -97,4 +97,5 @@ internal static class Extensions
             ix = Array.IndexOf(en, item, ix + 1);
         }
     }
+    public static int IndexOf<T>(this T[] arr, Func<T, bool> pred) => arr.Select<T, (T, int)?>((a, i) => (a, i)).Where(t => pred(t!.Value.Item1)).FirstOrDefault()?.Item2 ?? -1;
 }

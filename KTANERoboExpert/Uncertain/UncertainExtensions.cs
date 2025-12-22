@@ -3,21 +3,23 @@
 public static class UncertainExtensions
 {
     /// <summary>Maps this value to a new one if it is certain, or propogates uncertainty otherwise.</summary>
-    public static IUncertain<U> Map<T, U>(this IUncertain<T> u, Func<T, U> map) where U : notnull => u.IsCertain ? map(u.Value!) : Uncertain<U>.Of(u.Fill);
+    public static IUncertain<U> Map<T, U>(this IUncertain<T> u, Func<T, U> map) where T : notnull where U : notnull => u.IsCertain ? map(u.Value!) : Uncertain<U>.Of(u.Fill);
     /// <summary>Maps this value to an uncertain value if it is certain, or propogates uncertainty otherwise.</summary>
-    public static IUncertain<U> FlatMap<T, U>(this IUncertain<T> u, Func<T, IUncertain<U>> map) where U : notnull => u.IsCertain ? map(u.Value!) : Uncertain<U>.Of(u.Fill);
+    public static IUncertain<U> FlatMap<T, U>(this IUncertain<T> u, Func<T, IUncertain<U>> map) where T : notnull where U : notnull => u.IsCertain ? map(u.Value!) : Uncertain<U>.Of(u.Fill);
+    /// <summary>Maps this value to an uncertain value if it is certain, or propogates uncertainty otherwise.</summary>
+    public static IUncertain<T> FlatMap<T>(this IUncertain<IUncertain<T>> u) where T : notnull => u.IsCertain ? u.Value! : Uncertain<T>.Of(u.Fill);
     /// <summary>Gets the value if it is certain, or a default value if it is not.</summary>
-    public static T OrElse<T>(this IUncertain<T> u, T value) => u.IsCertain ? u.Value! : value;
+    public static T OrElse<T>(this IUncertain<T> u, T value) where T : notnull => u.IsCertain ? u.Value! : value;
     /// <summary>Gets the value if it is certain, or a default value provided by a function if it is not.</summary>
-    public static T OrElse<T>(this IUncertain<T> u, Func<T> value) => u.IsCertain ? u.Value! : value();
+    public static T OrElse<T>(this IUncertain<T> u, Func<T> value) where T : notnull => u.IsCertain ? u.Value! : value();
 
     /// <summary>Maps the value if it is certain, or gets a default value if it is not.</summary>
-    public static U Match<T, U>(this IUncertain<T> u, Func<T, U> map, Func<U> orElse) where U : notnull => u.IsCertain ? map(u.Value!) : orElse();
+    public static U Match<T, U>(this IUncertain<T> u, Func<T, U> map, Func<U> orElse) where T : notnull where U : notnull => u.IsCertain ? map(u.Value!) : orElse();
     /// <summary>Maps the value if it is certain, or gets a default value provided by a function if it is not.</summary>
-    public static U Match<T, U>(this IUncertain<T> u, Func<T, U> map, U orElse) where U : notnull => u.IsCertain ? map(u.Value!) : orElse;
+    public static U Match<T, U>(this IUncertain<T> u, Func<T, U> map, U orElse) where T : notnull where U : notnull => u.IsCertain ? map(u.Value!) : orElse;
 
     /// <summary>Unpacks and performs an action depending on the certainty.</summary>
-    public static void Do<T>(this IUncertain<T> u, Action<IUncertain<T>> onUncertain, Action<T> onCertain)
+    public static void Do<T>(this IUncertain<T> u, Action<IUncertain<T>> onUncertain, Action<T> onCertain) where T : notnull
     {
         if (u.IsCertain)
             onCertain(u.Value!);

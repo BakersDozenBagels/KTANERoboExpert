@@ -20,6 +20,7 @@ public record Edgework(
     UncertainInt Solves,
     UncertainInt SolvableModuleCount,
     UncertainInt NeedyModuleCount,
+    UncertainInt TwoFactorCount,
     UncertainInt WidgetCount)
 {
     /// <summary>The bomb's battery count.</summary>
@@ -36,20 +37,20 @@ public record Edgework(
 
     internal UncertainInt _batteryHolders { get => field.ButWithinRange(0, WidgetCount); init => field = value; } = BatteryHolders;
     /// <summary>The bomb's battery holder count.</summary>
-    public UncertainInt BatteryHolders => _batteryHolders.Coalesce(WidgetCount - (_indicatorCount + _portPlateCount).ButAtMost(WidgetCount));
+    public UncertainInt BatteryHolders => _batteryHolders.Coalesce(WidgetCount - (_indicatorCount + _portPlateCount + _twoFactorCount).ButAtMost(WidgetCount));
 
     internal UncertainEnumerable<Indicator> _indicators { get; init; } = Indicators;
     /// <summary>The bomb's indicators.</summary>
     public UncertainEnumerable<Indicator> Indicators { get => _indicators.IsCertain ? _indicators : UncertainEnumerable<Indicator>.Of(_indicators.Fill, 0, IndicatorCount.Max); }
     private UncertainInt _indicatorCount => _indicators.Count.Coalesce(UncertainInt.AtLeast(0, Indicators.Fill).ButAtMost(WidgetCount));
-    private UncertainInt IndicatorCount => _indicators.Count.Coalesce(WidgetCount - (_batteryHolders + _portPlateCount).ButAtMost(WidgetCount));
+    private UncertainInt IndicatorCount => _indicators.Count.Coalesce(WidgetCount - (_batteryHolders + _portPlateCount + _twoFactorCount).ButAtMost(WidgetCount));
 
     internal UncertainEnumerable<PortPlate> _ports { get; init; } = PortPlates;
     /// <summary>The bomb's port plates.</summary>
     public UncertainEnumerable<PortPlate> PortPlates { get => _ports.IsCertain ? _ports : UncertainEnumerable<PortPlate>.Of(_ports.Fill, 0, PortPlateCount.Max); }
 
     private UncertainInt _portPlateCount => _ports.Count.Coalesce(UncertainInt.AtLeast(0, _ports.Fill).ButAtMost(WidgetCount));
-    private UncertainInt PortPlateCount => _ports.Count.Coalesce(WidgetCount - (_batteryHolders + _indicatorCount).ButAtMost(WidgetCount));
+    private UncertainInt PortPlateCount => _ports.Count.Coalesce(WidgetCount - (_batteryHolders + _indicatorCount + _twoFactorCount).ButAtMost(WidgetCount));
 
     public UncertainInt PortCount => PortPlates.Map(pl => pl.Sum(CountPlate)).Into().Coalesce(PortPlateCount * UncertainInt.InRange(0, 4, PortPlates.Fill));
     /// <summary>The bomb's distinct ports.</summary>
@@ -66,6 +67,14 @@ public record Edgework(
     public UncertainInt DBatteries => (2 * BatteryHolders - Batteries).ButWithinRange(0, Batteries);
 
     public UncertainInt TotalModuleCount => SolvableModuleCount + NeedyModuleCount;
+
+    private UncertainInt _twoFactorCount { get; init; } = TwoFactorCount;
+    public UncertainInt TwoFactorCount => _twoFactorCount.Coalesce(WidgetCount - (_batteryHolders + _portPlateCount + _indicatorCount).ButAtMost(WidgetCount));
+
+#pragma warning disable CA1822 // Mark members as static
+    public UncertainInt DateOfManufactureWidgets => 0;
+    public UncertainInt TimeOfDayWidgets => 0;
+#pragma warning restore CA1822 // Mark members as static
 
     private static int CountPlate(PortPlate pl)
     {

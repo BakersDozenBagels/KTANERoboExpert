@@ -10,7 +10,7 @@
     }
 
     /// <inheritdoc cref="IUncertain"/>
-    public interface IUncertain<T> : IUncertain
+    public interface IUncertain<out T> : IUncertain where T : notnull
     {
         /// <summary>The value, if known.</summary>
         public T? Value { get; }
