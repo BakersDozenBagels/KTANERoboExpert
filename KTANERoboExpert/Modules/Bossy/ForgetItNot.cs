@@ -118,9 +118,9 @@ public partial class ForgetItNot : RoboExpertModule
 
     public override void Reset()
     {
-        _stages.Clear();
         if (_stages is not [])
             OnSolve -= HandleSolve;
+        _stages.Clear();
     }
 
     [GeneratedRegex(@"^go(?: (\d+))?(?: stage (\d+))?$")]

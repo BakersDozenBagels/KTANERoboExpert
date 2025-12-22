@@ -92,7 +92,20 @@ internal static partial class Program
                     return;
                 interrupts.Dequeue();
                 if (interrupts.Count is not 0)
-                    interrupts.Peek()(yield(interrupts.Peek()));
+                {
+                    var i = interrupts.Peek();
+                    try
+                    {
+                        i(yield(i));
+                    }
+                    catch (Exception ex)
+                    {
+                        Speak("There has been an error");
+                        Console.WriteLine(ex);
+                        ExitSubmenu(all: true);
+                        yield(i)();
+                    }
+                }
             };
         RoboExpertAPI.OnInterrupt += c =>
         {
@@ -332,7 +345,10 @@ internal static partial class Program
                 _listening = true;
 #if DEBUG
                 if (!_micOn)
+                {
                     _microphone.RecognizeAsync(RecognizeMode.Multiple);
+                    _micOn = true;
+                }
 #endif
                 break;
             case "--stop":
