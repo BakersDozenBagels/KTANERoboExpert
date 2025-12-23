@@ -19,7 +19,7 @@ public class FollowTheLeader : RoboExpertModule
         if (command is "solve")
         {
             Speak("Done");
-            _state.NewModule(new());
+            _state.NewModule(new(this));
             ExitSubmenu();
             Solve();
             return;
@@ -60,7 +60,7 @@ public class FollowTheLeader : RoboExpertModule
     }
 
     private readonly UndoStack<State> _state;
-    public FollowTheLeader() => _state = new(new());
+    public FollowTheLeader() => _state = new(new(this));
 
     public override void Select() => Ask(_state.Current);
 
@@ -122,7 +122,7 @@ public class FollowTheLeader : RoboExpertModule
 
         if (state.StepsDone is >= 10 || (extra && state.StepsDone is 9))
         {
-            _state.NewModule(new());
+            _state.NewModule(new(this));
             ExitSubmenu();
             Solve();
             return;
@@ -142,11 +142,11 @@ public class FollowTheLeader : RoboExpertModule
     {
         public UncertainBool WireAtSN => ((Edgework.Batteries == Edgework.SerialNumberDigits()[0].Into(0, 9)) & WireAtBatteries) | RawWireAtSN;
 
-        public State() : this(default!, default!, default!, default, default, default!)
+        public State(FollowTheLeader parent) : this(default!, default!, default!, default, default, default!)
         {
             _4to5 = UncertainBool.Of((_, __) => { _fill = new((s, b) => s with { _4to5 = b }); Speak("Wire from 4 to 5?"); });
-            WireAtBatteries = UncertainBool.Of((_, __) => { if (!Edgework.Batteries.IsCertain) { Edgework.Batteries.Fill(_, __); return; } _fill = new((s, b) => s with { WireAtBatteries = b }); Speak("Wire from " + Edgework.Batteries.Value + "?"); });
-            RawWireAtSN = UncertainBool.Of((_, __) => { if (!Edgework.SerialNumber.IsCertain) { Edgework.SerialNumber.Fill(_, __); return; } _fill = new((s, b) => s with { RawWireAtSN = b }); Speak("Wire from " + Edgework.SerialNumberDigits()[0].Value + "?"); });
+            WireAtBatteries = UncertainBool.Of((_, __) => { if (!Edgework.Batteries.IsCertain) { Edgework.Batteries.Fill(_, __); return; } if (Edgework.Batteries.Value is < 1 or > 12) { var n = parent._state.Current with { WireAtBatteries = false }; parent._state.Undo(); parent._state.Do(n); parent.Ask(n); return; } _fill = new((s, b) => s with { WireAtBatteries = b }); Speak("Wire from " + Edgework.Batteries.Value + "?"); });
+            RawWireAtSN = UncertainBool.Of((_, __) => { if (!Edgework.SerialNumber.IsCertain) { Edgework.SerialNumber.Fill(_, __); return; } if (Edgework.SerialNumberDigits()[0].Value is < 1 or > 12) { var n = parent._state.Current with { RawWireAtSN = false }; parent._state.Undo(); parent._state.Do(n); parent.Ask(n); return; } _fill = new((s, b) => s with { RawWireAtSN = b }); Speak("Wire from " + Edgework.SerialNumberDigits()[0].Value + "?"); });
 
             Rules = [
                 UncertainBool.Of((_, __) => { _fill = new((s, b) => s with { Rules = [..Rules![..0], !b, ..Rules![1..]] }); Speak("Previous wire is yellow blue or green?"); }),
