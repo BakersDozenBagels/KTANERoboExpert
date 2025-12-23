@@ -27,6 +27,11 @@ public static class UncertainExtensions
             onUncertain(u);
     }
 
+    /// <summary>Gets the characters in the serial number.</summary>
+    public static UncertainEnumerable<char> SerialNumberCharacters(this Edgework edgework) =>
+        edgework.SerialNumber.Match(
+            s => UncertainEnumerable<char>.Of(s),
+            () => UncertainEnumerable<char>.Of(edgework.SerialNumber.Fill, 6, 6));
     /// <summary>Gets the letters in the serial number.</summary>
     public static UncertainEnumerable<char> SerialNumberLetters(this Edgework edgework) =>
         edgework.SerialNumber.Match(
