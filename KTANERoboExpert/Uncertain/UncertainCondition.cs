@@ -14,7 +14,7 @@ namespace KTANERoboExpert.Uncertain
         /// <summary>Every possible outcome of this condition chain.</summary>
         public IEnumerable<T> Possibilities { get => Reduce().Select(tup => tup.Item2); }
         /// <summary>The only possible outcome of this condition chain, if applicable.</summary>
-        public T? Value { get => Reduce().First().Item2; }
+        public T? Value { get => _values[0].Item2; }
 
         private IEnumerable<(UncertainBool, T)> Reduce()
         {
