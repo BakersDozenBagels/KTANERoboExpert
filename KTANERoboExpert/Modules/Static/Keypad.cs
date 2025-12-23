@@ -69,6 +69,8 @@ public partial class Keypad : RoboExpertModule
         ["not equal"] = 23,
         ["a e"] = 24,
         ["a e ligature"] = 24,
+        ["alfa echo"] = 24,
+        ["alfa echo ligature"] = 24,
         ["hieroglyphic h"] = 25,
         ["hieroglyphic n"] = 25,
         ["omega"] = 26,
