@@ -29,6 +29,6 @@ public class Code : RoboExpertModule
 
         Speak(sol.Value.ToString());
         ExitSubmenu();
-        return;
+        Solve();
     }
 }
