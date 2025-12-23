@@ -1,4 +1,5 @@
-﻿using System.Speech.Recognition;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Speech.Recognition;
 
 namespace KTANERoboExpert;
 
@@ -74,14 +75,14 @@ public abstract class RoboExpertModule
     /// The NATO phonetic alphabet.
     /// </summary>
     protected internal static readonly IReadOnlyCollection<string> NATO = ["alfa", "bravo", "charlie", "delta", "echo", "foxtrot", "golf", "hotel", "india", "juliet", "kilo", "lima", "mike", "november", "oscar", "papa", "quebec", "romeo", "sierra", "tango", "uniform", "victor", "whiskey", "xray", "yankee", "zulu"];
-    /// <summary>
-    /// The numbers 0 to 101.
-    /// </summary>
+    /// <summary>The numbers 0 to 9.</summary>
+    protected internal static readonly IReadOnlyCollection<string> Digits = [.. Enumerable.Range(0, 10).Select(x => x.ToString())];
+    /// <summary>The numbers 0 to 101.</summary>
     protected internal static readonly IReadOnlyCollection<string> Numbers = [.. Enumerable.Range(0, 102).Select(x => x.ToString())];
-    /// <summary>
-    /// The numbers 0 to 1000.
-    /// </summary>
-    protected internal static readonly IReadOnlyCollection<string> BigNumbers = [.. Enumerable.Range(0, 1001).Select(x => x.ToString())];
+    /// <summary>The numbers 0 to max.</summary>
+    protected internal static string[] BigNumbers(int max) => [.. Enumerable.Range(0, max + 1).Select(x => x.ToString())];
+    /// <summary>The numbers min to max.</summary>
+    protected internal static string[] BigNumbers(int min, int max) => [.. Enumerable.Range(min, max - min + 1).Select(x => x.ToString())];
 
     /// <summary>
     /// The name of the module this class solves.
