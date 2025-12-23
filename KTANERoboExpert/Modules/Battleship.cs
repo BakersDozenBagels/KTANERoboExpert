@@ -28,7 +28,7 @@ public class Battleship : RoboExpertModule
         Last();
     }
 
-    private static string Coord((char l, int i) t) => NATO.ElementAt((t.l - 'F') % 5) + " " + ((t.i + 4) % 5 + 1);
+    private static string Coord((char l, int i) t) => NATO.ElementAt((t.l - 'A' + 5) % 5) + " " + ((t.i + 4) % 5 + 1);
 
     private void Last()
     {
